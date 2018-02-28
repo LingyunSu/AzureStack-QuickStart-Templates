@@ -1,3 +1,3 @@
 echo "helloworld"
-
-exit 0
+sudo mkdir ~/abc
+exit 3
