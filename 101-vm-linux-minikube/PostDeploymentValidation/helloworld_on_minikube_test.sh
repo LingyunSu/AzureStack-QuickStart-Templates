@@ -1,12 +1,12 @@
 #! /bin/bash
 #Define Console Output Color
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+RED='\033[0;31m'    # For error
+GREEN='\033[0;32m'  # For crucial check success 
+NC='\033[0m'        # No color, back to normal
 
-echo "Run post-deployment test to check the health of minikube deployment..."
+echo "Run post-deployment test to validate the health of minikube deployment..."
 
-# Check minikube status, if it is not running start minkube
+# Check minikube status, if it is off start minkube
 echo "Check minikube status..."
 isMinikubeRunning="$(sudo minikube status | grep 'minikube: Running')"
 
@@ -14,29 +14,28 @@ isMinikubeRunning="$(sudo minikube status | grep 'minikube: Running')"
 if [ -z $isMinikubeRunning ]; then
   echo "Minikube is off, starting minikube..."
   sudo minikube start --vm-driver 'none'
-  sleep 5s
 
   # Check status again
   isMinikubeRunning="$(sudo minikube status | grep 'minikube: Running')"
   if [[ -z $isMinikubeRunning ]]; then
-    echo -e "${RED}Failed to start minikube. Please troubleshoot the root cause.${NC} "
+    echo -e "${RED}Validation failed. Unable to start minikube. ${NC} "
     exit 3
   else
-    echo -e "${GREEN}Minikube is started.${NC}"
+    echo -e "${GREEN}Minikube has been started.${NC}"
   fi
 else
   echo -e "${GREEN}Minikube is started.${NC}"
 fi
 
 # Run helloworld application on mikikube
-echo "Run hello-world on minikube..."
+echo "Run hello-world on minikube...(image:msazurestackdocker/linsuhyperkube:v1)"
 sudo kubectl run helloworld --image=msazurestackdocker/linsuhyperkube:v1 --port=8080
 
 # Check pod status
 i=0
 isPodRunning=0
 while [ $i -lt 30 ];do
-  podstatus="$(sudo kubectl get pods | grep 'Running')"
+  podstatus="$(sudo kubectl get pods --selector run=helloworld | grep 'Running')"
 
   if [[ -z $podstatus ]]; then
     echo "Tracking helloworld pod status..."
@@ -55,12 +54,12 @@ if [ $isPodRunning -eq 0 ]; then
   exit 3
 fi
 
-# Expose hello-world app
-echo "Expose hello-world app..."
+# Expose hello-world service
+echo "Expose hello-world service..."
 sudo kubectl expose deployment helloworld --type=LoadBalancer
 
 i=0
-while [ $i -lt 30 ];do
+while [ $i -lt 10 ];do
   # Retrive external IP
   nodeIp=$(sudo kubectl describe service helloworld | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}:8080')
 
@@ -81,10 +80,11 @@ fi
 
 appurl="http://"$nodeIp
 appContent="$(curl ${appurl})"
+echo "curl return: "$appContent
 if [[ $appContent == "Hello World!" ]]; then
   echo -e "${GREEN}Minikube post-deployment validation pass!${NC}"
   exit 0
 else
-  echo -e "${RED}Validation failed because the app is not return right content. App return:"$appContent "${NC}"
+  echo -e "${RED}Validation failed. The hello-world app did not return expected content.${NC}"
   exit 3
 fi
