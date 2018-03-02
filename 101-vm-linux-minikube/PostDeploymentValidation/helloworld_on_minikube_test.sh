@@ -35,7 +35,7 @@ sudo kubectl run helloworld --image=msazurestackdocker/linsuhyperkube:v1 --port=
 # Check pod status
 i=0
 isPodRunning=0
-while [ $i -lt 10 ];do
+while [ $i -lt 30 ];do
   podstatus="$(sudo kubectl get pods | grep 'Running')"
 
   if [[ -z $podstatus ]]; then
@@ -60,27 +60,28 @@ echo "Expose hello-world app..."
 sudo kubectl expose deployment helloworld --type=LoadBalancer
 
 i=0
-while [ $i -lt 10 ];do
+while [ $i -lt 30 ];do
   # Retrive external IP
-  externalIp=$(sudo kubectl get services helloworld -o=custom-columns=NAME:.status.loadBalancer.ingress[0].ip | grep -oP '(\d{1,3}\.){1,3}\d{1,3}')
+  nodeIp=$(sudo kubectl describe service helloworld | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}:8080')
 
-  if [[ -z $externalIp ]]; then
+  if [[ -z $nodeIp ]]; then
     echo "Tracking helloworld servic status..."
     sleep 10s
   else
-    echo "External IP for helloworld:"$externalIps
+    echo "Get node IP/port for helloworld:"$nodeIp
+    break
   fi
   let i=i+1
 done
 
-if [[ -z $externalIp ]]; then
+if [[ -z $nodeIp ]]; then
   echo -e "${RED}Validation failed because the external ip for hello-world app is not available.${NC}"
   exit 3
 fi
 
-appurl="http://"$externalIp":8080"
+appurl="http://"$nodeIp
 appContent="$(curl ${appurl})"
-if [ $appContent -eq "Hello World!" ]; then
+if [[ $appContent == "Hello World!" ]]; then
   echo -e "${GREEN}Minikube post-deployment validation pass!${NC}"
   exit 0
 else
