@@ -99,7 +99,7 @@ if [[ $appContent == "Hello World!" ]]; then
   # Write return
   if $ISAUTO; then
     echo
-    echo "[[[(LOGOUTPUT)  PodIP:$nodeIp ]]]"
+    echo "[[[(TESTOUTPUT)  PodIP:$nodeIp ]]]"
   fi
 
   exit 0
