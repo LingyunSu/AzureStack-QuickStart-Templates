@@ -4,6 +4,13 @@ RED='\033[0;31m'    # For error
 GREEN='\033[0;32m'  # For crucial check success 
 NC='\033[0m'        # No color, back to normal
 
+LOGFILE="minikubetest.log"
+ISAUTO=false
+if [[ $1 == "AUTO" ]]; then
+  ISAUTO=true
+  echo "Test Start: "$(date +'%Y-%m-%d %H:%M:%S') > ./$LOGFILE
+fi
+
 echo "Run post-deployment test to validate the health of minikube deployment..."
 
 # Check minikube status, if it is off start minkube
@@ -25,6 +32,12 @@ if [ -z $isMinikubeRunning ]; then
   fi
 else
   echo -e "${GREEN}Minikube is started.${NC}"
+fi
+
+if $ISAUTO; then
+  echo "====== LOG Kubernete Version ====" >> ./$LOGFILE
+  sudo kubectl version >> ./$LOGFILE
+  echo >> ./$LOGFILE
 fi
 
 # Run helloworld application on mikikube
@@ -83,6 +96,12 @@ appContent="$(curl ${appurl})"
 echo "curl return: "$appContent
 if [[ $appContent == "Hello World!" ]]; then
   echo -e "${GREEN}Minikube post-deployment validation pass!${NC}"
+  # Write return
+  if $ISAUTO; then
+    echo
+    echo "[[[(LOGOUTPUT)  PodIP:$nodeIp ]]]"
+  fi
+
   exit 0
 else
   echo -e "${RED}Validation failed. The hello-world app did not return expected content.${NC}"
