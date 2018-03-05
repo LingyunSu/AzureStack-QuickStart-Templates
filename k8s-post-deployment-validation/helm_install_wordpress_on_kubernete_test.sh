@@ -4,6 +4,12 @@ RED='\033[0;31m'    # For error
 GREEN='\033[0;32m'  # For crucial check success 
 NC='\033[0m'        # No color, back to normal
 
+ISAUTO=false
+if [[ $1 == "AUTO" ]]; then
+  ISAUTO=true
+  echo "Test Start: "$(date +'%Y-%m-%d %H:%M:%S') > ./$LOGFILE
+fi
+
 echo "Deploy wordpress on Kubernete cluster through helm to check the health of Kubernete deployment ..."
 echo "Preparing helm..."
 
@@ -126,6 +132,12 @@ if [[ -z portalState ]]; then
   exit 3
 else
   echo -e "${GREEN} Wordpress is on. Portal returns status: ${portalState}.${NC}"
+
+  # If it is called from automation, return external ip for additional validation
+  if $ISAUTO; then
+    echo
+    echo "[[[(TESTOUTPUT)  WordpressIP:$nodeIp ]]]"
+  fi
 fi
 
 echo -e "${GREEN}Successfully deployed wordpress on Kubernete cluster through helm, validation pass!.${NC}"
