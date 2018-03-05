@@ -136,7 +136,7 @@ else
   # If it is called from automation, return external ip for additional validation
   if $ISAUTO; then
     echo
-    echo "[[[(TESTOUTPUT)  WordpressIP:$nodeIp ]]]"
+    echo "[[[(TESTOUTPUT)  WordpressIP:$externalIp ]]]"
   fi
 fi
 
