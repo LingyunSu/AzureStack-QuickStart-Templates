@@ -41,8 +41,8 @@ if $ISAUTO; then
 fi
 
 # Run helloworld application on mikikube
-echo "Run hello-world on minikube...(image:msazurestackdocker/linsuhyperkube:v1)"
-sudo kubectl run helloworld --image=msazurestackdocker/linsuhyperkube:v1 --port=8080
+echo "Run hello-world on minikube...(image:msazurestackdocker/helloworld:v1)"
+sudo kubectl run helloworld --image=msazurestackdocker/helloworld:v1 --port=8080
 
 # Check pod status
 i=0
