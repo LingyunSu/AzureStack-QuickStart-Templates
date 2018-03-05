@@ -14,7 +14,7 @@ if [[ -z helmcmd ]]; then
   
   # Create a folder for installation
   cd ~
-  mkdir heml
+  mkdir helm
   cd ./helm
   
   # Download and install helm
