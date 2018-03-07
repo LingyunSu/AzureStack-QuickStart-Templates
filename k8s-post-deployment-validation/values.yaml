@@ -1,4 +1,7 @@
-appName:helloworld
-image:msazurestackdocker/helloworld:v1
+appName: helloworld
+
+image: msazurestackdocker/helloworld:v1
+
 replicas: 3
-serviceType:LoadBalancer
+
+serviceType: LoadBalancer
