@@ -8,7 +8,8 @@ echo "Install Helm to check the health of Kubernete deployment..."
 
 # Install helm if it is not available
 helmcmd="$(helm)"
-if [[ -z helmcmd ]]; then
+
+if [[ -z $helmcmd ]]; then
   echo "Helm is not available, install helm..."
 
   # Create a folder for installation
