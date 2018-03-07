@@ -1,21 +1,21 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: helloworld-deployment
+  name: {{ .Values.appName }}-deployment
   labels:
     app: helloworld
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: helloworld
+      app: {{ .Values.appName }}
   template:
     metadata:
       labels:
-        app: helloworld
+        app: {{ .Values.appName }}
     spec:
       containers:
       - name: helloworld
-        image: msazurestackdocker/helloworld:v1
+        image: {{ .Values.image }}
         ports:
         - containerPort: 80
