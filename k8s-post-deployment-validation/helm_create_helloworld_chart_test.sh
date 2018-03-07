@@ -5,49 +5,18 @@ GREEN='\033[0;32m'  # For crucial check success
 NC='\033[0m'        # No color, back to normal
 
 echo "Make a helm chart for hello-world app and deploy in Kubernete to verify the usability of helm"
-echo "Preparing helm..."
-
-# Install helm if it is not available
-helmcmd="$(helm)"
-if [[ -z helmcmd ]]; then
-  echo "Helm is not available, install helm..."
-  
-  # Create a folder for installation
-  cd ~
-  mkdir helm
-  cd ./helm
-  
-  # Download and install helm
-  curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
-  chmod 700 get_helm.sh
-  ./get_helm.sh
-
-  # Check again, if still not available, test fail
-  helmcmd="$(helm)"
-  if [[ -z helmcmd ]]; then
-    echo  -e "${RED}Validation failed. Unable to install helm. ${NC}"
-	exit 3
-  fi
-  
-  echo -e "${GREEN}Helm is installed.${NC}"
-fi
-
-echo -e "${GREEN}Helm is ready.${NC}"
-
-# Initial helm
-echo "Initial helm..."
-helm init --upgrade
+echo "Check helm..."
 
 # Check healm health status
 helmClientVer="$(helm version | grep -o 'Client: \(.*\)[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
 helmServerVer="$(helm version | grep -o 'Server: \(.*\)[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
 
 if [[ -z $helmClientVer ]] || [[ -z $helmServerVer ]]; then
-  echo  -e "${RED}Validation failed. Helm initial failed.${NC}"
+  echo  -e "${RED}Validation failed. Helm is not ready. Please install and initial helm before run this validation script.${NC}"
   exit 3
-else
-  echo -e "${GREEN}Helm is initialed.${NC}"
 fi
+
+echo -e "${GREEN}Helm is ready.${NC}"
 
 # Create environment for chart
 echo "Preparing for helloworld chart... "
@@ -63,7 +32,7 @@ rm values.yaml
 curl https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/master/k8s-post-deployment-validation/values.yaml > values.yaml
 rm -rf templates
 mkdir templates
-curl https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/master/k8s-post-deployment-validation/helloworld.yaml > helloworld.yaml
+curl https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/master/k8s-post-deployment-validation/helloworld.yaml > ./templates/helloworld.yaml
 
 echo "Package helloworld chart..."
 cd ~/helmtest/
@@ -80,6 +49,8 @@ echo -e "${GREEN}Done with package helloworld chart.${NC}"
 
 echo "Installing helloworld chart"
 helm install ./helloworld
+
+sleep 5s
 
 echo "Done with installation, checking release status..."
 hwRelease=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-]+')
