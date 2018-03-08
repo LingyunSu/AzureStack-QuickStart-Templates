@@ -94,7 +94,7 @@ function checkService {
     externalIp=$(sudo kubectl get services helloworld -o=custom-columns=NAME:.status.loadBalancer.ingress[0].ip | grep -oP '(\d{1,3}\.){1,3}\d{1,3}')
 
     if [[ -z $externalIp ]]; then
-      echo "Tracking wordpress external IP status..."
+      echo "Tracking helloworld external IP status..."
       sleep 30s
     else
       echo -e "${GREEN}External IP is available: ${externalIp}.${NC}"
@@ -104,7 +104,7 @@ function checkService {
   done
 
   if [[ -z $externalIp ]]; then
-    echo -e "${RED}Validation failed. The external IP of wordpress is not available.${NC}"
+    echo -e "${RED}Validation failed. The external IP of helloworld is not available.${NC}"
     exit 3
   fi
   
