@@ -18,4 +18,4 @@ spec:
       - name: helloworld
         image: {{ .Values.image }}
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.containerPort }}
