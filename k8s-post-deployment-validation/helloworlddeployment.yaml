@@ -7,9 +7,9 @@ metadata:
 spec:
   type: {{ .Values.serviceType }}
   ports:
-  - port: 80
-    targetPort: 8080
+  - port: {{ .Values.servicePort }}
+    targetPort: {{ .Values.targetPort }}
     protocol: TCP
-    name: helloworld
+    name: {{ .Values.appName }}
   selector:
     app: {{ .Values.appName }}
