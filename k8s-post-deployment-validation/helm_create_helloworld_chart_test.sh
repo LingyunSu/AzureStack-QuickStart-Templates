@@ -86,6 +86,30 @@ if [ $isPodsRunning -ne 1 ]; then
   exit 3
 fi
 
+# Check service availability
+function checkService {
+  # Check external IP for helloworld chart
+  i=0
+  while [ $i -lt 20 ];do
+    externalIp=$(sudo kubectl get services helloworld -o=custom-columns=NAME:.status.loadBalancer.ingress[0].ip | grep -oP '(\d{1,3}\.){1,3}\d{1,3}')
+
+    if [[ -z $externalIp ]]; then
+      echo "Tracking wordpress external IP status..."
+      sleep 30s
+    else
+      echo -e "${GREEN}External IP is available: ${externalIp}.${NC}"
+      break
+    fi
+    let i=i+1
+  done
+
+  if [[ -z $externalIp ]]; then
+    echo -e "${RED}Validation failed. The external IP of wordpress is not available.${NC}"
+    exit 3
+  fi
+}
+checkService
+
 # Delete the release
 helm delete $hwRelease
 
@@ -103,25 +127,7 @@ helm rollback $hwRelease 1
 sleep 5s
 hwRelease=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-]+')
 
-# Check external IP for helloworld chart
-i=0
-while [ $i -lt 20 ];do
-  externalIp=$(sudo kubectl get services helloworld -o=custom-columns=NAME:.status.loadBalancer.ingress[0].ip | grep -oP '(\d{1,3}\.){1,3}\d{1,3}')
 
-  if [[ -z $externalIp ]]; then
-    echo "Tracking wordpress external IP status..."
-    sleep 30s
-  else
-    echo -e "${GREEN}External IP is available: ${externalIp}.${NC}"
-    break
-  fi
-  let i=i+1
-done
-
-if [[ -z $externalIp ]]; then
-  echo -e "${RED}Validation failed. The external IP of wordpress is not available.${NC}"
-  exit 3
-fi
 
 # Check portal status
 portalState="$(curl http://${externalIp} --head -s | grep '200 OK')"
@@ -131,6 +137,7 @@ if [[ -z portalState ]]; then
   exit 3
 else
 
+checkService
 
 echo -e "${GREEN}Helm chart validation pass!${NC}"
 exit 0
