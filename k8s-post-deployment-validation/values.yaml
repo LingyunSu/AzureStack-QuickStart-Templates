@@ -10,4 +10,4 @@ servicePort: 80
 
 targetPort: 8080
 
-containerPort: 2018
+containerPort: 80
