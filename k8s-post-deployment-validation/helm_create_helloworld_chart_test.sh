@@ -121,6 +121,7 @@ echo "Validating service and portal healthy state..."
 checkService
 
 # Delete the release
+echo "Delete release ${hwRelease} ..."
 helm delete $hwRelease
 
 # Check again to make sure the release is removed
@@ -130,10 +131,13 @@ hwReleaseN=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-
 if [[ ! -z $hwReleaseN ]]; then
   echo "${RED}Test failed. Delete release ${hwRelease} failed.${NC}"
 fi
+echo -e "${GREEN}Successfully deleted release ${hwRelease} ...${NC}"
 
+# Rollback release
 echo "Rollback release ${hwRelease} ..."
 helm rollback $hwRelease 1
 
+# Check availability again
 sleep 5s
 hwRelease=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-]+')
 
