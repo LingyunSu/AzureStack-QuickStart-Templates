@@ -5,3 +5,9 @@ image: msazurestackdocker/helloworld:v1
 replicas: 3
 
 serviceType: LoadBalancer
+
+servicePort: 80
+
+targetPort: 8080
+
+containerPort: 2018
