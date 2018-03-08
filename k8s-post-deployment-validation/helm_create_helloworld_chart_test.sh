@@ -107,7 +107,17 @@ function checkService {
     echo -e "${RED}Validation failed. The external IP of wordpress is not available.${NC}"
     exit 3
   fi
+  
+  # Check portal status
+  portalState="$(curl http://${externalIp} --head -s | grep '200 OK')"
+
+  if [[ -z portalState ]]; then
+    echo -e "${RED}Validation failed. Helloworld app is not on.${NC}"
+    exit 3
+  fi
 }
+
+echo "Validating service and portal healthy state..."
 checkService
 
 # Delete the release
@@ -127,16 +137,14 @@ helm rollback $hwRelease 1
 sleep 5s
 hwRelease=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-]+')
 
-
-
-# Check portal status
-portalState="$(curl http://${externalIp} --head -s | grep '200 OK')"
-
-if [[ -z portalState ]]; then
-  echo -e "${RED}Validation failed. Helloworld app is not on.${NC}"
+if [[ -z $hwRelease ]]; then
+  echo  -e "${RED}Validation failed. Rollback helloworld release ${hwRelease} failed.${NC}"
   exit 3
 else
+  echo -e "${GREEN}Rollback helloworld successfully. The release name is ${hwRelease}${NC}"
+fi 
 
+echo "Validating service and portal healthy state..."
 checkService
 
 echo -e "${GREEN}Helm chart validation pass!${NC}"
