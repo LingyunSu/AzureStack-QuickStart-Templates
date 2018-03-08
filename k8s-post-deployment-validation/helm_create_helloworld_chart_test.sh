@@ -33,6 +33,7 @@ curl https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates
 rm -rf templates
 mkdir templates
 curl https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/master/k8s-post-deployment-validation/helloworld.yaml > ./templates/helloworld.yaml
+curl https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/master/k8s-post-deployment-validation/helloworlddeployment.yaml > ./templates/helloworlddeployment.yaml
 
 echo "Package helloworld chart..."
 cd ~/helmtest/
@@ -60,7 +61,7 @@ if [[ -z $hwRelease ]]; then
   exit 3
 else
   echo -e "${GREEN}Helloworld is deployed through helm. The release name is ${hwRelease}${NC}"
-fi
+fi 
 
 # Check pods status
 echo "Monitoring pods status..."
@@ -84,6 +85,52 @@ if [ $isPodsRunning -ne 1 ]; then
   echo  -e "${RED}Validation failed. Desired count of helloworld pods are not ready.${NC}"
   exit 3
 fi
+
+# Delete the release
+helm delete $hwRelease
+
+# Check again to make sure the release is removed
+sleep 5s
+hwReleaseN=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-]+')
+
+if [[ ! -z $hwReleaseN ]]; then
+  echo "${RED}Test failed. Delete release ${hwRelease} failed.${NC}"
+fi
+
+echo "Rollback release ${hwRelease} ..."
+helm rollback $hwRelease 1
+
+sleep 5s
+hwRelease=$(helm ls -d -r | grep 'DEPLOYED\(.*\)helloworld' | grep -Eo '^[a-z,-]+')
+
+# Check external IP for helloworld chart
+i=0
+while [ $i -lt 20 ];do
+  externalIp=$(sudo kubectl get services helloworld -o=custom-columns=NAME:.status.loadBalancer.ingress[0].ip | grep -oP '(\d{1,3}\.){1,3}\d{1,3}')
+
+  if [[ -z $externalIp ]]; then
+    echo "Tracking wordpress external IP status..."
+    sleep 30s
+  else
+    echo -e "${GREEN}External IP is available: ${externalIp}.${NC}"
+    break
+  fi
+  let i=i+1
+done
+
+if [[ -z $externalIp ]]; then
+  echo -e "${RED}Validation failed. The external IP of wordpress is not available.${NC}"
+  exit 3
+fi
+
+# Check portal status
+portalState="$(curl http://${externalIp} --head -s | grep '200 OK')"
+
+if [[ -z portalState ]]; then
+  echo -e "${RED}Validation failed. Helloworld app is not on.${NC}"
+  exit 3
+else
+
 
 echo -e "${GREEN}Helm chart validation pass!${NC}"
 exit 0
