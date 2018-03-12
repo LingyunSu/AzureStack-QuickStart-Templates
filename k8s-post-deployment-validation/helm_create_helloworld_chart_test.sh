@@ -6,7 +6,7 @@ NC='\033[0m'        # No color, back to normal
 
 if [[ $1 == "AUTO" ]]; then
   echo "Test case disabled for Automation."
-  exit 3
+  exit 0
 fi
 
 echo "Make a helm chart for hello-world app and deploy in Kubernete to verify the usability of helm"
