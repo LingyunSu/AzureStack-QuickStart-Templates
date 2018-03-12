@@ -45,12 +45,26 @@ echo "Check Helm client and Tiller availability..."
 sleep 10s
 
 # Check helm client and tiller status
-helmClientVer="$(helm version | grep -o 'Client: \(.*\)[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
-helmServerVer="$(helm version | grep -o 'Server: \(.*\)[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
+echo "Monitoring helm status..."
+i=0
+isHelmReady=0
+while [ $i -lt 20 ]; do
+  helmClientVer="$(helm version | grep -o 'Client: \(.*\)[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
+  helmServerVer="$(helm version | grep -o 'Server: \(.*\)[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
 
-if [[ -z $helmClientVer ]] || [[ -z $helmServerVer ]]; then
+  if [[ -z $helmClientVer ]] || [[ -z $helmServerVer ]]; then
+    echo "Tracking helm status ..."
+    sleep 10s
+  else
+    echo -e "${GREEN}Helm is ready.${NC}"
+    isHelmReady=1
+    break
+  fi
+  let i=i+1
+done
+
+if [ $isHelmReady -ne 1 ]; then
   echo  -e "${RED}Validation failed. Helm initial failed.${NC}"
-  exit 3
 fi
 
 echo -e "${GREEN}Validation Pass! Helm has been initialed.${NC}"
