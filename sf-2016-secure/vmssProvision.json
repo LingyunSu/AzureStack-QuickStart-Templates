@@ -14,15 +14,27 @@
                 "description": "VM Scaleset name"
             }
         },
-        "instanceCount": {
-            "type": "int",
-            "metadata": {
-                "description": "Number of VM instances."
-            }
-        },
         "nodeTypePrefix": {
             "type": "string",
-            "maxLength": 9
+            "maxLength": 8
+        },
+        "nodeTypeInstanceCounts": {
+            "type": "array",
+            "metadata": {
+                "description": "List of instance counts for all node types."
+            }
+        },
+        "nodeTypeIndex": {
+            "type": "int",
+            "metadata": {
+                "description": "Current node type index."
+            }
+        },
+        "subnetIPFormat": {
+            "type": "string",
+            "metadata": {
+                "description": "Subnetwork IP prefix format. eg:10.0.[].0/24"
+            }
         },
         "overProvision": {
             "type": "string"
@@ -71,10 +83,22 @@
         "diagStoreAccountName": {
             "type": "string"
         },
+        "diagStoreAccountKey": {
+            "type": "string"
+        },
+        "diagStoreAccountBlobUri": {
+            "type": "string"
+        },
+        "diagStoreAccountTableUri": {
+            "type": "string"
+        },
         "dnsLabel": {
             "type": "string"
         },
         "subnetID": {
+            "type": "string"
+        },
+        "publicIPID" :{
             "type": "string"
         },
         "lbPortsArray": {
@@ -145,6 +169,9 @@
         "applicationEndPort": {
             "type": "int"
         },
+        "adminClientConnectionEndpoint": {
+            "type": "string"
+        },
         "adminClientCertificateThumbprint": {
             "type": "array",
             "defaultValue": [ ],
@@ -169,6 +196,12 @@
             "type": "string",
             "metadata": {
                 "description": "Service fabric runtime download url."
+            }
+        },
+        "serviceFabricRuntimeUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "Service fabric runtime download url. Leave it empty if using the latest."
             }
         },
         "scriptBaseUrl": {
@@ -197,8 +230,6 @@
         "nicName": "[concat(parameters('vmScaleSetName'), 'nic')]",
         "lbName": "[concat(parameters('vmScaleSetName'), 'lb')]",
         "lbID": "[resourceId('Microsoft.Network/loadBalancers', variables('lbName'))]",
-        "lbIPName": "[concat(parameters('vmScaleSetName'), 'pip')]",
-        "lbPublicIPID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('lbIPName'))]",
         "bePoolName": "[concat(parameters('vmScaleSetName'), 'bepool')]",
         "natPoolName": "[concat(parameters('vmScaleSetName'), 'natpool')]",
         "ipConfigName": "[concat(parameters('vmScaleSetName'), 'ipconfig')]",
@@ -216,17 +247,19 @@
         "scriptName": "PrepareServiceFabricDeployment.ps1",
         "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
         "clusterCertThumbprintParam": "[concat(' -CertificateThumbprint ', parameters('certificateThumbprint') )]",
+        "networkParam" : "[concat(concat(' -SubnetIPFormat ', parameters('subnetIPFormat') ), concat(' -NodeTypeCount ', length(parameters('nodeTypeInstanceCounts')) ))]",
         "reverseProxyCertThumbprintParam": "[concat(' -ReverseProxyCertificateThumbprint ', parameters('reverseProxyCertificateThumbprint') )]",
-        "commandParam0": "[variables('clusterCertThumbprintParam')]",
+        "commandParam0": "[concat(variables('clusterCertThumbprintParam'), variables('networkParam'))]",
         "commandParam": "[if(equals(trim(parameters('reverseProxyCertificateThumbprint')), ''), variables('commandParam0'), concat(variables('commandParam0'), variables('reverseProxyCertThumbprintParam')))]",
 
         "serviceFabricDeploymentModuleUrl": "[uri(parameters('scriptBaseUrl'), 'DeploySFCluster.zip')]",
         "serviceFabricDeploymentConfigFunction": "DeploySFCluster.ps1\\InstallServiceFabricConfiguration",
         "serviceFabricConfigPath": "[uri(parameters('scriptBaseUrl'), 'ClusterConfig.X509.MultiMachine.json')]",
+        "serviceFabricRuntimeUrl": "[if(equals(trim(parameters('serviceFabricRuntimeUrl')), ''), 'N/A', parameters('serviceFabricRuntimeUrl'))]",
 
         "deploymentNodeIndex": 0,
 
-        "vmssExtensions0": [
+        "vmssExtensions0": [ 
             {
                 "name": "PrepareServiceFabric",
                 "properties": {
@@ -234,13 +267,11 @@
                     "settings": {
                         "fileUris": [
                             "[variables('serviceFabricPrepareScriptUrl')]"
-                        ]
+                        ],
+                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'), variables('commandParam'))]"
                     },
                     "typeHandlerVersion": "1.8",
                     "autoUpgradeMinorVersion": true,
-                    "protectedSettings": {
-                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'), variables('commandParam'))]"
-                    },
                     "type": "CustomScriptExtension"
                 }
             }
@@ -254,13 +285,11 @@
                     "settings": {
                         "fileUris": [
                             "[variables('serviceFabricPrepareScriptUrl')]"
-                        ]
+                        ],
+                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'), variables('commandParam'))]"
                     },
                     "typeHandlerVersion": "1.8",
                     "autoUpgradeMinorVersion": true,
-                    "protectedSettings": {
-                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'), variables('commandParam'))]"
-                    },
                     "type": "CustomScriptExtension"
                 }
             },
@@ -276,9 +305,10 @@
                         "configurationFunction": "[variables('serviceFabricDeploymentConfigFunction')]",
                         "properties": {
                             "DeploymentNodeIndex": "[variables('deploymentNodeIndex')]",
-                            "InstanceCount": "[parameters('instanceCount')]",
                             "ClusterName": "[parameters('clusterName')]",
-                            "nodeTypePrefix": "[parameters('nodeTypePrefix')]",
+                            "VMNodeTypePrefix": "[parameters('nodeTypePrefix')]",
+                            "VMNodeTypeInstanceCounts": "[parameters('nodeTypeInstanceCounts')]",
+                            "CurrentVMNodeTypeIndex": "[parameters('nodeTypeIndex')]",
                             "clientConnectionEndpointPort": "[parameters('servicefabricTcpGatewayPort')]",
                             "httpGatewayEndpointPort": "[parameters('servicefabricHttpGatewayPort')]",
                             "reverseProxyEndpointPort": "[parameters('servicereverseProxyEndpointPort')]",
@@ -291,15 +321,24 @@
                             "reverseProxyCertificateThumbprint": "[parameters('reverseProxyCertificateThumbprint')]",
                             "adminClientCertificateThumbprint": "[parameters('adminClientCertificateThumbprint')]",
                             "nonAdminClientCertificateThumbprint": "[parameters('nonAdminClientCertificateThumbprint')]",
-                            "ClientConnectionEndpoint": "",
+                            "ClientConnectionEndpoint": "[parameters('adminClientConnectionEndpoint')]",
                             "DNSService": "[parameters('DNSService')]",
                             "RepairManager": "[parameters('RepairManager')]",
                             "ConfigPath": "[variables('serviceFabricConfigPath')]",
                             "serviceFabricUrl": "[parameters('serviceFabricUrl')]",
+                            "serviceFabricRuntimeUrl": "[variables('serviceFabricRuntimeUrl')]",
                             "DiagStoreAccountName": "[parameters('diagStoreAccountName')]",
-                            "DiagStoreAccountKey": "",
-                            "DiagStoreAccountBlobUri": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('diagStoreAccountName')), '2016-01-01', 'Full').primaryEndpoints.blob]",
-                            "DiagStoreAccountTableUri": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('diagStoreAccountName')), '2016-01-01', 'Full').primaryEndpoints.table]"
+                            "DiagStoreAccountKey": "[parameters('diagStoreAccountKey')]",
+                            "DiagStoreAccountBlobUri": "[parameters('diagStoreAccountBlobUri')]",
+                            "DiagStoreAccountTableUri": "[parameters('diagStoreAccountTableUri')]"
+                        }
+                    },
+                    "protectedSettings": {
+                        "properties": {
+                            "Credential": {
+                                "Username": "[parameters('adminUsername')]",
+                                "Password": "[parameters('adminPassword')]"
+                            }
                         }
                     }
                 }
@@ -308,37 +347,17 @@
     },
     "resources": [
         {
-            "apiVersion": "[variables('apiVersion').publicIPApiVersion]",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('lbIPName')]",
-            "location": "[variables('location')]",
-            "dependsOn": [ ],
-            "properties": {
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabel')]"
-                },
-                "publicIPAllocationMethod": "Dynamic"
-            },
-            "tags": {
-                "resourceType": "Service Fabric",
-                "displayName": "PublicIP"
-            }
-        },
-        {
             "apiVersion": "[variables('apiVersion').lbApiVersion]",
             "type": "Microsoft.Network/loadBalancers",
             "name": "[variables('lbName')]",
             "location": "[variables('location')]",
-            "dependsOn": [
-                "[variables('lbPublicIPID')]"
-            ],
             "properties": {
                 "frontendIPConfigurations": [
                     {
                         "name": "LoadBalancerIPConfig",
                         "properties": {
                             "publicIPAddress": {
-                                "id": "[variables('lbPublicIPID')]"
+                                "id": "[parameters('publicIPID')]"
                             }
                         }
                     }
@@ -464,7 +483,7 @@
                     "osProfile": {
                         "adminPassword": "[parameters('adminPassword')]",
                         "adminUsername": "[parameters('adminUsername')]",
-                        "computerNamePrefix": "[parameters('nodeTypePrefix')]",
+                        "computerNamePrefix": "[concat(parameters('nodeTypePrefix'), parameters('nodeTypeIndex'))]",
                         "secrets": [
                             {
                                 "sourceVault": {
@@ -506,7 +525,7 @@
             },
             "sku": {
                 "name": "[parameters('vmNodeSize')]",
-                "capacity": "[parameters('instanceCount')]"
+                "capacity": "[parameters('nodeTypeInstanceCounts')[parameters('nodeTypeIndex')]]"
             },
             "tags": {
                 "resourceType": "Service Fabric",

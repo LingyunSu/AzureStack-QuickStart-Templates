@@ -5,7 +5,13 @@
         [string] $CertificateThumbprint,
 
         [Parameter(Mandatory=$false)]
-        [string] $ReverseProxyCertificateThumbprint=""
+        [string] $ReverseProxyCertificateThumbprint="",
+
+        [parameter(Mandatory = $true)]
+        [string] $SubnetIPFormat,
+
+        [parameter(Mandatory = $true)]
+        [System.UInt32] $NodeTypeCount
 )
 
 $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
@@ -16,6 +22,17 @@ Write-Verbose "Opening TCP firewall port 445 for networking."
 Set-NetFirewallRule -Name 'FPS-SMB-In-TCP' -Enabled True
 Get-NetFirewallRule -DisplayGroup 'Network Discovery' | Set-NetFirewallRule -Profile 'Private, Public' -Enabled true
 
+# Add remote IP addresse for Windows Remote Management (HTTP-In)
+# This enables every node have access to the nods which are behind different sub domain
+# IP got from paramater should have a format of 10.0.[].0/24
+Write-Verbose "Add remote IP addresses for Windows Remote Management (HTTP-In) for different sub domain."
+$IParray = @()
+for($i = 0; $i -lt $NodeTypeCount; $i ++)
+{
+    $IParray += $SubnetIPFormat.Replace("[]", $i)
+}
+Set-NetFirewallRule -Name 'WINRM-HTTP-In-TCP-PUBLIC' -RemoteAddress $IParray
+Write-Verbose "Subnet IPs enabled in WINRM-HTTP-In-TCP-PUBLIC: $IParray"
 
 # As per Service fabric documentation at: https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-windows-cluster-x509-security#install-the-certificates
 # set the access control on this certificate so that the Service Fabric process, which runs under the Network Service account, 
