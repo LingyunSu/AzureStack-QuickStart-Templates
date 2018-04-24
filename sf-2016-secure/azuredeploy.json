@@ -513,7 +513,7 @@
                         "value": "[variables('adminClientCertificateThumbprint')]"
                     },
                     "adminClientConnectionEndpoint": {
-                        "value": "[concat(reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, copyIndex()), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]"
+                        "value": "[concat(reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]"
                     },
                     "nonAdminClientCertificateThumbprint": {
                         "value": "[variables('nonAdminClientCertificateThumbprint')]"
@@ -673,7 +673,7 @@
                         "value": "[variables('adminClientCertificateThumbprint')]"
                     },
                     "adminClientConnectionEndpoint": {
-                        "value": "[concat(reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, copyIndex()), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]"
+                        "value": "[concat(reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]"
                     },
                     "nonAdminClientCertificateThumbprint": {
                         "value": "[variables('nonAdminClientCertificateThumbprint')]"
