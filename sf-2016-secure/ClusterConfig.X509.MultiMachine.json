@@ -38,14 +38,34 @@
             "ClusterCredentialType": "X509",
             "ServerCredentialType": "X509",
             "CertificateInformation": {
-                "ClusterCertificate": {
-                    "Thumbprint": "[Thumbprint]",
+	            "ClusterCertificateCommonNames": {
+                    "CommonNames": [
+                    {
+                        "CertificateCommonName": "LingyunDev1.redmond.corp.microsoft.com"
+                    }
+                    ],
                     "X509StoreName": "My"
                 },
-                "ServerCertificate": {
-                    "Thumbprint": "[Thumbprint]",
+                "ClusterCertificateIssuerStores": [
+                    {
+                        "IssuerCommonName": "LingyunDev1.redmond.corp.microsoft.com",
+                        "X509StoreNames" : "My"
+                    }
+                ],
+                "ServerCertificateCommonNames": {
+                    "CommonNames": [
+                    {
+                        "CertificateCommonName": "LingyunDev1.redmond.corp.microsoft.com"
+                    }
+                    ],
                     "X509StoreName": "My"
                 },
+                "ServerCertificateIssuerStores": [
+                    {
+                        "IssuerCommonName": "LingyunDev1.redmond.corp.microsoft.com",
+                        "X509StoreNames" : "My"
+                    }
+                ],
                 "ReverseProxyCertificate": {
                     "Thumbprint": "[Thumbprint]",
                     "X509StoreName": "My"
