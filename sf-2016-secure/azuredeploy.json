@@ -190,7 +190,7 @@
         "serviceFabricUrl": {
             "type": "string",
             "metadata": {
-                "description": "Service fabric deployment pakage download url."
+                "description": "Service fabric deployment package download url."
             },
             "defaultValue": "http://go.microsoft.com/fwlink/?LinkId=730690"
         },
