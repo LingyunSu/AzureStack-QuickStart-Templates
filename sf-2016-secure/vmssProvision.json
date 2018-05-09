@@ -224,7 +224,7 @@
 
         "location": "[resourceGroup().location]",
 
-        "storageAccountName": "[toLower(concat('SA', uniqueString(resourceGroup().id)))]",
+        "storageAccountName": "[toLower(concat('SA', uniqueString(resourceGroup().id), parameters('nodeTypeIndex')))]",
         "storageAccountType": "Standard_LRS",
 
         "nicName": "[concat(parameters('vmScaleSetName'), 'nic')]",
