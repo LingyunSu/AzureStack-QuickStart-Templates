@@ -298,7 +298,7 @@
                 "properties": {
                     "publisher": "Microsoft.Powershell",
                     "type": "DSC",
-                    "typeHandlerVersion": "2.76",
+                    "typeHandlerVersion": "2.19",
                     "autoUpgradeMinorVersion": true,
                     "settings": {
                         "modulesUrl": "[variables('serviceFabricDeploymentModuleUrl')]",
@@ -309,7 +309,6 @@
                             "VMNodeTypePrefix": "[parameters('nodeTypePrefix')]",
                             "VMNodeTypeInstanceCounts": "[parameters('nodeTypeInstanceCounts')]",
                             "CurrentVMNodeTypeIndex": "[parameters('nodeTypeIndex')]",
-                            "SubnetIPFormat": "[parameters('subnetIPFormat')]",
                             "clientConnectionEndpointPort": "[parameters('servicefabricTcpGatewayPort')]",
                             "httpGatewayEndpointPort": "[parameters('servicefabricHttpGatewayPort')]",
                             "reverseProxyEndpointPort": "[parameters('servicereverseProxyEndpointPort')]",
