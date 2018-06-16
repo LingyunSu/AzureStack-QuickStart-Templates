@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusterName": {
+      "value": "SFCluster"
+    },
+    "nodeTypePrefix": {
+      "value": "SFNode"
+    },
+    "primaryNtInstanceCount": {
+      "value": 5
+    },
+    "additionalNodeTypeInstaceCounts": {
+      "value": [
+        2
+      ]
+    },
+    "vmImageSku": {
+      "value": "2016-Datacenter"
+    },
+    "vmNodeSize": {
+      "value": "Standard_D2_v2"
+    },
+    "adminUserName": {
+      "value": "azureuser"
+    },
+    "adminPassword": {
+      "value": "adminpassword"
+    },
+    "servicefabricTcpGatewayPort": {
+      "value": 19000
+    },
+    "servicefabricHttpGatewayPort": {
+      "value": 19080
+    },
+    "servicefabricReverseProxyEndpointPort": {
+      "value": 19081
+    },
+    "lbApplicationPorts": {
+      "value": []
+    },
+    "nsgPorts": {
+      "value": []
+    },
+    "sourceVaultValue": {
+      "value": ""
+    },
+    "clusterCertificateUrlValue": {
+      "value": ""
+    },
+    "certificateThumbprint": {
+      "value": "0984053b9639215d278a0e4b4ab1120e75057463"
+    },
+    "reverseProxyCertificateUrlValue": {
+      "value": null
+    },
+    "reverseProxyCertificateThumbprint": {
+      "value": null
+    },
+    "adminClientCertificateThumbprints": {
+      "value": "0272251171BA32CEC7938A65B8A6A553AA2D3283"
+    },
+    "nonAdminClientCertificateThumbprints": {
+      "value": null
+    },
+    "DNSService": {
+      "value": "No"
+    },
+    "RepairManager": {
+      "value": "No"
+    },
+    "serviceFabricUrl": {
+      "value": "http://go.microsoft.com/fwlink/?LinkId=730690"
+    },
+    "serviceFabricRuntimeUrl": {
+      "value": null
+    },
+    "scriptBaseUrl": {
+      "value": "https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/sf_iot_dev/sf-2016-secure/"
+    }
+  }
+}
