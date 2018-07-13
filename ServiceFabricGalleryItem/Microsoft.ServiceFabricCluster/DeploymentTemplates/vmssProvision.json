@@ -428,7 +428,11 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('storageAccountName')]",
+            "name": "[concat(variables('storageAccountName'), copyIndex('vsmsStorage'))]",
+            "copy": {
+                  "name": "vsmsStorage",
+                  "count": "[parameters('nodeTypeInstanceCounts')[parameters('nodeTypeIndex')]]"
+            },
             "apiVersion": "[variables('apiVersion').storageApiVersion]",
             "location": "[variables('location')]",
             "sku": {
@@ -510,14 +514,14 @@
                             "sku": "[parameters('vmImageSku')]",
                             "version": "[parameters('vmImageVersion')]"
                         },
-                        "osDisk": {
-                            "name": "[parameters('osDiskName')]",
-                            "caching": "ReadOnly",
-                            "createOption": "FromImage",
-                            "vhdContainers": [
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]"
-                            ]
-                        }
+                      "osDisk": {
+                        "name": "[parameters('osDiskName')]",
+                        "caching": "ReadOnly",
+                        "createOption": "FromImage",
+                        "vhdContainers": [
+                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 0)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]"
+                        ]
+                      }
                     },
                     "extensionProfile": {
                         "extensions": "[if(equals(parameters('runDSC'), 'Yes'), variables('vmssExtensions1'), variables('vmssExtensions0'))]"

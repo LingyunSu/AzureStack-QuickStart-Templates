@@ -78,21 +78,30 @@
                 "isPrimary": true
             }
         ],
-        "fabricSettings": [
+      "fabricSettings": [
+        {
+          "name": "Setup",
+          "parameters": [
             {
-                "name": "Setup",
-                "parameters": [
-                    {
-                        "name": "FabricDataRoot",
-                        "value": "C:\\ProgramData\\SF"
-                    },
-                    {
-                        "name": "FabricLogRoot",
-                        "value": "C:\\ProgramData\\SF\\Log"
-                    }
-                ]
+              "name": "FabricDataRoot",
+              "value": "D:\\SF"
+            },
+            {
+              "name": "FabricLogRoot",
+              "value": "D:\\SF\\Log"
             }
-        ],
+          ]
+        },
+        {
+          "name": "Management",
+          "parameters": [
+            {
+              "name": "EnableDeploymentAtDataRoot",
+              "value": true
+            }
+          ]
+        }
+      ],
         "addOnFeatures": [
             "DnsService",
             "RepairManager"
