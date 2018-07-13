@@ -91,6 +91,15 @@
                         "value": "C:\\ProgramData\\SF\\Log"
                     }
                 ]
+            },
+            {
+                "Name": "Management",
+                "Parameters":[
+                    {
+                        "Name": "EnableDeploymentAtDataRoot",
+                        "Value": true
+                    }
+                ]
             }
         ],
         "addOnFeatures": [
