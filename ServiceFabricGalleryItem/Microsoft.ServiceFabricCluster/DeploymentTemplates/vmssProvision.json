@@ -428,7 +428,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[concat(variables('storageAccountName'), copyIndex())]",
+            "name": "[concat(variables('storageAccountName'), copyIndex('VmssStorages'))]",
             "copy": {
                   "name": "VmssStorages",
                   "count": "5"
