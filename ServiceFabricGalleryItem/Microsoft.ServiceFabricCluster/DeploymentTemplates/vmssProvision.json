@@ -428,9 +428,9 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[concat(variables('storageAccountName'), copyIndex('vsmsStorage'))]",
+            "name": "[concat(variables('storageAccountName'), copyIndex())]",
             "copy": {
-                  "name": "vsmsStorage",
+                  "name": "VmssStorages",
                   "count": "[parameters('nodeTypeInstanceCounts')[parameters('nodeTypeIndex')]]"
             },
             "apiVersion": "[variables('apiVersion').storageApiVersion]",
@@ -447,7 +447,7 @@
             "location": "[variables('location')]",
             "dependsOn": [
                 "[variables('lbID')]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+                "VmssStorages"
             ],
             "properties": {
                 "overprovision": "[parameters('overProvision')]",
