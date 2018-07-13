@@ -428,10 +428,10 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[concat(variables('storageAccountName'), copyIndex('VmssStorages'))]",
+            "name": "[concat(variables('storageAccountName'), copyIndex())]",
             "copy": {
                   "name": "VmssStorages",
-                  "count": "5"
+                  "count": 5
             },
             "apiVersion": "[variables('apiVersion').storageApiVersion]",
             "location": "[variables('location')]",
