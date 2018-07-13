@@ -431,7 +431,7 @@
             "name": "[concat(variables('storageAccountName'), copyIndex())]",
             "copy": {
                   "name": "VmssStorages",
-                  "count": "[parameters('nodeTypeInstanceCounts')[parameters('nodeTypeIndex')]]"
+                  "count": "5"
             },
             "apiVersion": "[variables('apiVersion').storageApiVersion]",
             "location": "[variables('location')]",
@@ -519,7 +519,11 @@
                         "caching": "ReadOnly",
                         "createOption": "FromImage",
                         "vhdContainers": [
-                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 0)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]"
+                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 0)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 1)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 2)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 3)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                          "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 4)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]"
                         ]
                       }
                     },
