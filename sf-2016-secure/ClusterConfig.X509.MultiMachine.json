@@ -93,11 +93,11 @@
                 ]
             },
             {
-                "Name": "Management",
-                "Parameters":[
+                "name": "Management",
+                "parameters":[
                     {
-                        "Name": "EnableDeploymentAtDataRoot",
-                        "Value": true
+                        "name": "EnableDeploymentAtDataRoot",
+                        "value": true
                     }
                 ]
             }
