@@ -428,7 +428,11 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('storageAccountName')]",
+            "name": "[concat(variables('storageAccountName'), copyIndex())]",
+            "copy": {
+                  "name": "VmssStorages",
+                  "count": 5
+            },
             "apiVersion": "[variables('apiVersion').storageApiVersion]",
             "location": "[variables('location')]",
             "sku": {
@@ -443,7 +447,7 @@
             "location": "[variables('location')]",
             "dependsOn": [
                 "[variables('lbID')]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+                "VmssStorages"
             ],
             "properties": {
                 "overprovision": "[parameters('overProvision')]",
@@ -510,14 +514,18 @@
                             "sku": "[parameters('vmImageSku')]",
                             "version": "[parameters('vmImageVersion')]"
                         },
-                        "osDisk": {
-                            "name": "[parameters('osDiskName')]",
-                            "caching": "ReadOnly",
-                            "createOption": "FromImage",
-                            "vhdContainers": [
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]"
-                            ]
-                        }
+                      "osDisk": {
+                        "name": "[parameters('osDiskName')]",
+                        "caching": "ReadOnly",
+                        "createOption": "FromImage",
+                        "vhdContainers": [
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 0)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 1)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 2)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 3)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountName'), 4)), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, parameters('vhdContainerName'))]"
+                        ]
+                      }
                     },
                     "extensionProfile": {
                         "extensions": "[if(equals(parameters('runDSC'), 'Yes'), variables('vmssExtensions1'), variables('vmssExtensions0'))]"

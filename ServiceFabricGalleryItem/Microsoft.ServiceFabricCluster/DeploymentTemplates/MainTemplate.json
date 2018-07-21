@@ -22,7 +22,7 @@
                 "description": "Size of the VM scale set (Min 5 and Max 100)."
             },
             "defaultValue": 5,
-            "minValue": 5,
+            "minValue": 3,
             "maxValue": 100
         },
         "additionalNodeTypeInstaceCounts": {
