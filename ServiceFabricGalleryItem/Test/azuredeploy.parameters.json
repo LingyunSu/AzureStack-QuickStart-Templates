@@ -77,7 +77,7 @@
       "value": null
     },
     "scriptBaseUrl": {
-      "value": "https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/sf_iot_dev/sf-2016-secure/"
+      "value": "https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/sf_gallery_stable/ServiceFabricGalleryItem/Microsoft.ServiceFabricCluster/DeploymentTemplates/"
     }
   }
 }
