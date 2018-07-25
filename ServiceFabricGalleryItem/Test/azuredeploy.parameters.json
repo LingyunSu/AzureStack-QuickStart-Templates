@@ -51,16 +51,16 @@
       "value": "0984053b9639215d278a0e4b4ab1120e75057463"
     },
     "reverseProxyCertificateUrlValue": {
-      "value": null
+      "value": ""
     },
     "reverseProxyCertificateThumbprint": {
-      "value": null
+      "value": ""
     },
     "adminClientCertificateThumbprints": {
       "value": "0272251171BA32CEC7938A65B8A6A553AA2D3283"
     },
     "nonAdminClientCertificateThumbprints": {
-      "value": null
+      "value": ""
     },
     "DNSService": {
       "value": "No"
@@ -72,7 +72,7 @@
       "value": "http://go.microsoft.com/fwlink/?LinkId=730690"
     },
     "serviceFabricRuntimeUrl": {
-      "value": null
+      "value": ""
     },
     "scriptBaseUrl": {
       "value": "https://raw.githubusercontent.com/LingyunSu/AzureStack-QuickStart-Templates/sf_gallery_stable/ServiceFabricGalleryItem/Microsoft.ServiceFabricCluster/DeploymentTemplates/"
