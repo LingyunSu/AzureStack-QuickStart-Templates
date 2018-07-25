@@ -12,7 +12,7 @@
       "value": 3
     },
     "additionalNodeTypeInstaceCounts": {
-      "value": []
+      "value": [2]
     },
     "vmImageSku": {
       "value": "2016-Datacenter"
