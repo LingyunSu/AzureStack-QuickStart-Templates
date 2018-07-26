@@ -11,9 +11,6 @@
     "primaryNtInstanceCount": {
       "value": 3
     },
-    "additionalNodeTypeInstaceCounts": {
-      "value": [2]
-    },
     "vmImageSku": {
       "value": "2016-Datacenter"
     },
@@ -34,12 +31,6 @@
     },
     "servicefabricReverseProxyEndpointPort": {
       "value": 19081
-    },
-    "lbApplicationPorts": {
-      "value": []
-    },
-    "nsgPorts": {
-      "value": []
     },
     "sourceVaultValue": {
       "value": ""
