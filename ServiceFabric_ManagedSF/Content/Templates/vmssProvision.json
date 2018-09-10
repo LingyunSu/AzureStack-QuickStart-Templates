@@ -196,7 +196,7 @@
       "lbNatPoolID": "[concat(variables('lbID'),'/inboundNatPools/', variables('natPoolName'))]",
       "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('bePoolName'))]"
     },
-    "scriptName": "PrepareServiceFabricDeployment.ps1",
+    "scriptName": "DeploySFCluster.ps1",
     "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
     "apos": "'",
     "rootCertParam": "[concat(' -RootCACertBase64 ', variables('apos'), parameters('rootCertBase64'), variables('apos'))]",
