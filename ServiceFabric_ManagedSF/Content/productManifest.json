@@ -1,0 +1,16 @@
+﻿{
+  "$schema": "https://azurestack.external/schemas/product-manifest/2018-07-01.json#",
+  "packageId": "Microsoft.SfrpDemo.1.0.0",
+  "deploymentConditions": {
+    "minimumStampVersion": "1.0.0.0"
+  },
+  "updateConditions": {
+    "minimumProductVersion": "1.0"
+  },
+  "deploymentDefinition": {
+    "subscriptionType": "Metering",
+    "bootstrapTemplate": "Templates/bootstrap.json",
+    "mainTemplate": "Templates/main.json"
+  },
+  "uiDefinition": "UI/uiDefinition.json"
+}

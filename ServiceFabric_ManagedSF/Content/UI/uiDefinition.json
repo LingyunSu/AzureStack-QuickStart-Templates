@@ -1,0 +1,57 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Compute.MultiVm",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "basics": [
+      {
+        "name": "clusterCertThumbprint",
+        "type": "Microsoft.Common.TextBox",
+        "label": "SF cluster certificate",
+        "toolTip": "Internal SF cluster certificate thumbprint.",
+        "defaultValue": "",
+        "constraints": {
+          "required": true
+        }
+      },
+      {
+        "name": "adminClientCertThumbprint",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Admin client certificate",
+        "toolTip": "Admin client certificate thumbprint.",
+        "defaultValue": "",
+        "constraints": {
+          "required": true
+        }
+      },
+      {
+        "name": "nonAdminClientCertThumbprint",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Non-admin client certificate",
+        "toolTip": "Non-admin client certificate thumbprint.",
+        "defaultValue": "",
+        "constraints": {
+          "required": true
+        }
+      },
+      {
+        "name": "applicationCertThumbprint",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Application SSL certificate",
+        "toolTip": "Application SSL certificate thumbprint.",
+        "defaultValue": "",
+        "constraints": {
+          "required": true
+        }
+      }
+    ],
+    "steps": [
+    ],
+    "outputs": {
+      "clusterCertThumbprint": "[basics('clusterCertThumbprint')]",
+      "adminClientCertThumbprint": "[basics('adminClientCertThumbprint')]",
+      "nonAdminClientCertThumbprint": "[basics('nonAdminClientCertThumbprint')]",
+      "applicationCertThumbprint": "[basics('applicationCertThumbprint')]"
+    }
+  }
+}
