@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(EnvironmentConfig)" />
+
+  <PropertyGroup>
+    <SourceDir>Content</SourceDir>
+    <OutputPath>$(BinariesBuildTypeArchDirectory)\DeploymentItems\SFClusterDSC\</OutputPath>
+    <DestinationFileName>$(OutputPath)DeploySFCluster.zip</DestinationFileName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Files Include="Content\**\*" />
+  </ItemGroup>
+
+  <Target Name="Build" Inputs="@(Files)" Outputs="$(DestinationFileName)">
+    <MakeDir Directories="$(OutputPath)" />
+    <Exec Command="powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Unrestricted $(SRCROOT)\Tools\New-ZipArchive\New-ZipArchive.ps1 -SourceDir '$(SourceDir)' -DestinationFileName '$(DestinationFileName)'" />
+  </Target>
+
+  <Target Name="VerifyAlteredTargetsUsed" />
+
+</Project>

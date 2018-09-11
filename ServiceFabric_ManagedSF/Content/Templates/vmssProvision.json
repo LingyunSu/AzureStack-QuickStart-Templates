@@ -196,8 +196,7 @@
       "lbNatPoolID": "[concat(variables('lbID'),'/inboundNatPools/', variables('natPoolName'))]",
       "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('bePoolName'))]"
     },
-    "scriptName": "Testing.ps1",
-    "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
+
     "apos": "'",
     "rootCertParam": "[concat(' -RootCACertBase64 ', variables('apos'), parameters('rootCertBase64'), variables('apos'))]",
     "networkParam": "[concat(concat(' -SubnetIPFormat ', parameters('subnetIPFormat') ), concat(' -NodeTypeCount ', length(parameters('nodeTypeInstanceCounts')) ))]",
@@ -208,21 +207,53 @@
     "serviceFabricRuntimeUrl": "[if(equals(trim(parameters('serviceFabricRuntimeUrl')), ''), 'N/A', parameters('serviceFabricRuntimeUrl'))]",
     "certificateStoreValue": "My",
     "deploymentNodeIndex": 0,
-
-    "vmssExtensions": [
+    
+    "vmssExtensions": [      
       {
-        "name": "PrepareServiceFabric",
+        "name": "DeployServiceFabricCluster",
         "properties": {
-          "publisher": "Microsoft.Compute",
-          "settings": {
-            "fileUris": [
-              "[variables('serviceFabricPrepareScriptUrl')]"
-            ],
-            "commandToExecute": "'-Para 11'"
-          },
-          "typeHandlerVersion": "1.8",
+          "publisher": "Microsoft.Powershell",
+          "type": "DSC",
+          "typeHandlerVersion": "2.19",
           "autoUpgradeMinorVersion": true,
-          "type": "CustomScriptExtension"
+          "settings": {
+            "modulesUrl": "[variables('serviceFabricDeploymentModuleUrl')]",
+            "configurationFunction": "[variables('serviceFabricDeploymentConfigFunction')]",
+            "properties": {
+              "DeploymentNodeIndex": "[variables('deploymentNodeIndex')]",
+              "ClusterName": "[parameters('clusterName')]",
+              "VMNodeTypePrefix": "[parameters('nodeTypePrefix')]",
+              "VMNodeTypeInstanceCounts": "[parameters('nodeTypeInstanceCounts')]",
+              "CurrentVMNodeTypeIndex": "[parameters('nodeTypeIndex')]",
+              "SubnetIPFormat": "[parameters('subnetIPFormat')]",
+              "clientConnectionEndpointPort": "[parameters('servicefabricTcpGatewayPort')]",
+              "httpGatewayEndpointPort": "[parameters('servicefabricHttpGatewayPort')]",
+              "reverseProxyEndpointPort": "[parameters('servicereverseProxyEndpointPort')]",
+              "ephemeralStartPort": "[parameters('ephemeralStartPort')]",
+              "ephemeralEndPort": "[parameters('ephemeralEndPort')]",
+              "applicationStartPort": "[parameters('applicationStartPort')]",
+              "applicationEndPort": "[parameters('applicationEndPort')]",
+              "certificateStoreValue": "[variables('certificateStoreValue')]",
+              "ClientConnectionEndpoint": "[parameters('adminClientConnectionEndpoint')]",
+              "DNSService": "[parameters('DNSService')]",
+              "RepairManager": "[parameters('RepairManager')]",
+              "ConfigPath": "[variables('serviceFabricConfigPath')]",
+              "serviceFabricUrl": "[parameters('serviceFabricUrl')]",
+              "serviceFabricRuntimeUrl": "[variables('serviceFabricRuntimeUrl')]",
+              "DiagStoreAccountName": "[parameters('diagStoreAccountName')]",
+              "DiagStoreAccountKey": "[parameters('diagStoreAccountKey')]",
+              "DiagStoreAccountBlobUri": "[parameters('diagStoreAccountBlobUri')]",
+              "DiagStoreAccountTableUri": "[parameters('diagStoreAccountTableUri')]"
+            }
+          },
+          "protectedSettings": {
+            "properties": {
+              "Credential": {
+                "Username": "[parameters('adminUsername')]",
+                "Password": "[parameters('adminPassword')]"
+              }
+            }
+          }
         }
       }
     ]
