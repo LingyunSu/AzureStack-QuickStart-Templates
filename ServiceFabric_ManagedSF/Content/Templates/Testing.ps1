@@ -9,3 +9,4 @@ param
 
 Write-Verbose "Start testing...$Para"
 
+exit 0
