@@ -218,7 +218,7 @@
             "fileUris": [
               "[variables('serviceFabricPrepareScriptUrl')]"
             ],
-            "commandToExecute": "'-Para 10'"
+            "commandToExecute": "'-Para 11'"
           },
           "typeHandlerVersion": "1.8",
           "autoUpgradeMinorVersion": true,
