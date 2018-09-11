@@ -1100,7 +1100,8 @@ function Wait-ForAllNodesReadiness
                 $InstanceCount = $InstanceCounts[$j]
                 $VMNodeTypeName = "$VMNodeTypePrefix$j"
                 
-                for($i = 0; $i -lt $InstanceCount; $i++)
+                # Skip master node, from node 1 on till max id
+                for($i = 1; $i -lt $InstanceCount; $i++)
                 {
                     [String] $base36Index = (convertTo-Base36 -decNum $i)
                     $nodeName = $VMNodeTypeName + $base36Index.PadLeft(6, "0")
@@ -1142,11 +1143,16 @@ function Wait-ForAllNodesReadiness
             {
                 Write-Verbose "Waiting for all other nodes. Waiting for 3 minutes..."
                 sleep -Seconds 180
+            }
+            else
+            {
+                Write-Verbose "All nodes are ready!"
+                break
             }    
 
         }while($areAllNodesReady -and ((Get-Date) -lt $timeoutTime))
 
-        if(-not $isExpectedPermission)
+        if(-not $areAllNodesReady)
         {
             throw "Timed out while waiting for other nodes."
         }
