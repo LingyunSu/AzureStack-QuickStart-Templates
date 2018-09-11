@@ -1110,7 +1110,7 @@ function Wait-ForAllNodesReadiness
                     {
                         $nodeIsReady = Invoke-Command -ScriptBlock {
                                                     $isExpectedPermission = $true
-                                                    $Using:$allCerts | % {
+                                                    $Using:allCerts | % {
                                                             $certThumbprint = $_
                                                             $cert = dir Cert:\LocalMachine\My\ | ? {$_.Thumbprint -eq "$certThumbprint"}
                                                             $rsaFile = $cert.PrivateKey.CspKeyContainerInfo.UniqueKeyContainerName
