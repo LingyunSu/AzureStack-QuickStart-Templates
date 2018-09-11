@@ -100,6 +100,8 @@ param
         $RepairManager = "No"
  )
 
+
+$preConditionBlock = {
 # Static certificate Common Names for Service Fabric deployment
 $subjectNames = @{  "ClusterCert" = "CN=SFClusterCertificate";
                     "ServerCert" = "CN=SFServerCertificate";
@@ -148,6 +150,8 @@ catch {
     Write-Verbose $_
 }
 
+}
+
 # Provision util functions
 function Grant-CertAccess
 {
@@ -191,6 +195,7 @@ function Grant-CertAccess
 }
 
 
+$preSFDeploymentBlock = {
 # SF deployment workflow Step 2: Deployment 
 #     For new SF deployment, running from the 'master' node. For scaling out scenario, running from the target node. 
 
@@ -422,6 +427,8 @@ New-ServiceFabricDeployment -setupDir $setupDir -ConfigFilePath $ConfigFilePath 
 Write-Verbose "Validating Service Fabric deployment."
 
 Test-ServiceFabricDeployment -setupDir $setupDir
+
+}
 
 
 # Deployment util functions
@@ -1517,3 +1524,8 @@ function Initial-ServiceFabricClusterConfiguration
 
     Monitor-UpdateServiceFabricConfiguration
 }
+
+
+& $preConditionBlock
+& $preSFDeploymentBlock
+
