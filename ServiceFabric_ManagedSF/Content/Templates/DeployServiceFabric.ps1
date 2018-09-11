@@ -1088,8 +1088,14 @@ function Wait-ForAllNodesReadiness
         {
             $totalNodeCounts = $totalNodeCounts + $InstanceCounts[$j]
         }
+        $totalMinutes = $totalNodeCounts*15
 
-        $timeoutTime = (Get-Date).AddMinutes($totalNodeCounts*15)
+        # The CSE max timeout is 90 minutes, the max waiting time for deployment is 85 minutes, 5 minutes left for error handling etc.
+        if($totalMinutes -gt 80)
+        {
+           $totalMinutes = 80
+        }
+        $timeoutTime = (Get-Date).AddMinutes($totalMinutes)
 
         # Monitoring
         do
@@ -1128,12 +1134,16 @@ function Wait-ForAllNodesReadiness
                         {
                             Write-Verbose "Node '$nodeName' is ready."
                         }
+                        else
+                        {
+                            Write-Verbose "Node '$nodeName' is not ready."
+                        }
 
                         $areAllNodesReady =  $areAllNodesReady -and $nodeIsReady
                     }
                     catch
                     {
-                        Write-Verbose "Failed to checking node '$nodeName'. The host maybe is not ready. Continue monitoring..."
+                        Write-Verbose "Failed to checking node '$nodeName'. Continue monitoring... $_"
                         $nodeIsReady = $false
                     }
                 }
