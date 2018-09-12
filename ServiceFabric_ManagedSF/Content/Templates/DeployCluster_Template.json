@@ -250,7 +250,7 @@
     "scriptName": "PrepareServiceFabricDeployment.ps1",
     "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
     "isReverseProxyCert": "[if(equals(trim(parameters('reverseProxyCertificateUrlValue')), ''), bool('false'), bool('true'))]",
-    "certurls": "[concat(array(parameters('clusterCertificateUrlValue')),array(parameters('serverCertificateUrlValue')),array(parameters('adminClientCertificateUrlValue')),array(parameters('nonAdminClientCertificateUrlValue')))]",
+    "certurls": "[concat(array(parameters('clusterCertificateUrlValue')), array(parameters('serverCertificateUrlValue')), array(parameters('adminClientCertificateUrlValue')), array(parameters('nonAdminClientCertificateUrlValue')), array(parameters('sslCertSecretUri')))]",
     "certsToInstall": "[if(not(variables('isReverseProxyCert')), variables('certurls'), concat(variables('certurls'), array(parameters('reverseProxyCertificateUrlValue'))))]"
 
   },
