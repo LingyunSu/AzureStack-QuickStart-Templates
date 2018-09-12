@@ -240,7 +240,7 @@
               "DiagStoreAccountKey": "[parameters('diagStoreAccountKey')]",
               "DiagStoreAccountBlobUri": "[parameters('diagStoreAccountBlobUri')]",
               "DiagStoreAccountTableUri": "[parameters('diagStoreAccountTableUri')]",
-              "rootCertBase64": "[parameters('rootCertBase64')]"
+              "RootCACertBase64": "[parameters('rootCertBase64')]"
             }
           },
           "protectedSettings": {
