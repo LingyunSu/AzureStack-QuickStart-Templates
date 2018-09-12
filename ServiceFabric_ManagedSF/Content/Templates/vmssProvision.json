@@ -197,10 +197,6 @@
       "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('bePoolName'))]"
     },
 
-    "apos": "'",
-    "rootCertParam": "[concat(' -RootCACertBase64 ', variables('apos'), parameters('rootCertBase64'), variables('apos'))]",
-    "networkParam": "[concat(concat(' -SubnetIPFormat ', parameters('subnetIPFormat') ), concat(' -NodeTypeCount ', length(parameters('nodeTypeInstanceCounts')) ))]",
-    "commandParam": "[concat(variables('rootCertParam'), variables('networkParam'))]",
     "serviceFabricDeploymentModuleUrl": "[uri(parameters('scriptBaseUrl'), 'DeploySFCluster.zip')]",
     "serviceFabricDeploymentConfigFunction": "DeploySFCluster.ps1\\InstallServiceFabricConfiguration",
     "serviceFabricConfigPath": "[uri(parameters('scriptBaseUrl'), 'ClusterConfig.X509.MultiMachine.json')]",
@@ -243,7 +239,8 @@
               "DiagStoreAccountName": "[parameters('diagStoreAccountName')]",
               "DiagStoreAccountKey": "[parameters('diagStoreAccountKey')]",
               "DiagStoreAccountBlobUri": "[parameters('diagStoreAccountBlobUri')]",
-              "DiagStoreAccountTableUri": "[parameters('diagStoreAccountTableUri')]"
+              "DiagStoreAccountTableUri": "[parameters('diagStoreAccountTableUri')]",
+              "rootCertBase64": "[parameters('rootCertBase64')]"
             }
           },
           "protectedSettings": {

@@ -68,6 +68,9 @@
     [Parameter(Mandatory = $true)]
     [string] $certificateStoreValue,
 
+    [Parameter(Mandatory = $true)]
+    [string] $RootCACertBase64,
+
     [Parameter(Mandatory = $false)]
     [string] $DNSService = "No",
 
@@ -107,6 +110,7 @@
             CertificateStoreValue = $certificateStoreValue
             ClientConnectionEndpoint = $ClientConnectionEndpoint
             PsDscRunAsCredential = $Credential
+            RootCACertBase64 = $RootCACertBase64
             DNSService = $DNSService
             RepairManager = $RepairManager
         }
