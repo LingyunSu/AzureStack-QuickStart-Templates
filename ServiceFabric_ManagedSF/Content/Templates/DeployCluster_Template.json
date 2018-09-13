@@ -362,7 +362,7 @@
       "name": "[concat('VMSSProvisioning', copyindex())]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
-        "name": "VMSSProvisioning",
+        "name": "VMSSProvisionAndSFDeployment",
         "count": "[length(variables('nodeTypeInstanceCounts'))]"
       },
       "dependsOn": [
@@ -495,9 +495,6 @@
           },
           "rootCertBase64": {
             "value": "[parameters('rootCertBase64')]"
-          },
-          "sslCertSecretUri": {
-            "value": "[parameters('sslCertSecretUri')]"
           }
         }
       }
@@ -508,12 +505,16 @@
       "type": "string",
       "value": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', concat(variables('imageConfig').vmssUniqueName, '0'))]"
     },
-    "applicationEndpointURL": {
-      "value": "[concat('https://', reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricHttpGatewayPort'))]",
-      "type": "string"
-    },
     "administrationEndpointURL": {
-      "value": "[concat(reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]",
+      "type": "string",
+      "value": "[concat('https://', reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]"
+    },
+    "applicationEndpointURL": {
+      "type": "string",
+      "value": "[concat('https://', reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricHttpGatewayPort'))]"
+    },
+    "endpointFQDN": {
+      "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn]",
       "type": "string"
     }
   }

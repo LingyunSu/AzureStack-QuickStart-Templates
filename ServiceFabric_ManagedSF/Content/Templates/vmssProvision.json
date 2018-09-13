@@ -163,9 +163,6 @@
     },
     "rootCertBase64": {
       "type": "string"
-    },
-    "sslCertSecretUri": {
-      "type": "string"
     }
   },
   "variables": {
