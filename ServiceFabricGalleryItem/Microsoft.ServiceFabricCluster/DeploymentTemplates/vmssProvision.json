@@ -72,14 +72,6 @@
                 "description": "Remote desktop user password. Must be a strong password"
             }
         },
-        "runDSC": {
-            "type": "string",
-            "allowedValues": [
-                "Yes",
-                "No"
-            ],
-            "defaultValue": "No"
-        },
         "diagStoreAccountName": {
             "type": "string"
         },
@@ -120,6 +112,12 @@
                 "description": "Refers to the location URL in your key vault where the certificate was uploaded, it is should be in the format of https://<name of the vault>.vault.azure.net:443/secrets/<exact location>"
             }
         },
+        "serverCertificateUrlValue": {
+            "type": "string",
+            "metadata": {
+                "description": "Refers to the location URL in your key vault where the certificate was uploaded, it is should be in the format of https://<name of the vault>.vault.azure.net:443/secrets/<exact location>"
+            }
+        },
         "certificateStoreValue": {
             "type": "string",
             "allowedValues": [
@@ -130,7 +128,13 @@
                 "description": "The store name where the cert will be deployed in the virtual machine"
             }
         },
-        "certificateThumbprint": {
+        "clusterCertificateThumbprint": {
+            "type": "string",
+            "metadata": {
+                "description": "Certificate Thumbprint"
+            }
+        },
+        "serverCertificateThumbprint": {
             "type": "string",
             "metadata": {
                 "description": "Certificate Thumbprint"
@@ -240,18 +244,7 @@
             "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('bePoolName'))]"
         },
 
-        "isReverseProxyCert": "[if(equals(trim(parameters('reverseProxyCertificateUrlValue')), ''), bool('false'), bool('true'))]",
-        "isSameCert": "[if(equals(parameters('clusterCertificateUrlValue'), parameters('reverseProxyCertificateUrlValue')), bool('true'), bool('false'))]",
-        "certsToInstall": "[if(or(not(variables('isReverseProxyCert')), variables('isSameCert')), array(parameters('clusterCertificateUrlValue')), concat(array(parameters('clusterCertificateUrlValue')), array(parameters('reverseProxyCertificateUrlValue'))))]",
-
-        "scriptName": "PrepareServiceFabricDeployment.ps1",
-        "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
-        "clusterCertThumbprintParam": "[concat(' -CertificateThumbprint ', parameters('certificateThumbprint') )]",
-        "networkParam" : "[concat(concat(' -SubnetIPFormat ', parameters('subnetIPFormat') ), concat(' -NodeTypeCount ', length(parameters('nodeTypeInstanceCounts')) ))]",
-        "reverseProxyCertThumbprintParam": "[concat(' -ReverseProxyCertificateThumbprint ', parameters('reverseProxyCertificateThumbprint') )]",
-        "commandParam0": "[concat(variables('clusterCertThumbprintParam'), variables('networkParam'))]",
-        "commandParam": "[if(equals(trim(parameters('reverseProxyCertificateThumbprint')), ''), variables('commandParam0'), concat(variables('commandParam0'), variables('reverseProxyCertThumbprintParam')))]",
-
+        "certsToInstall": "[if(equals(parameters('reverseProxyCertificateUrlValue'), ''), concat(array(parameters('clusterCertificateUrlValue')), array(parameters('serverCertificateUrlValue'))), concat(array(parameters('clusterCertificateUrlValue')), array(parameters('serverCertificateUrlValue')), array(parameters('reverseProxyCertificateUrlValue'))))]",
         "serviceFabricDeploymentModuleUrl": "[uri(parameters('scriptBaseUrl'), 'DeploySFCluster.zip')]",
         "serviceFabricDeploymentConfigFunction": "DeploySFCluster.ps1\\InstallServiceFabricConfiguration",
         "serviceFabricConfigPath": "[uri(parameters('scriptBaseUrl'), 'ClusterConfig.X509.MultiMachine.json')]",
@@ -259,40 +252,7 @@
 
         "deploymentNodeIndex": 0,
 
-        "vmssExtensions0": [ 
-            {
-                "name": "PrepareServiceFabric",
-                "properties": {
-                    "publisher": "Microsoft.Compute",
-                    "settings": {
-                        "fileUris": [
-                            "[variables('serviceFabricPrepareScriptUrl')]"
-                        ],
-                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'), variables('commandParam'))]"
-                    },
-                    "typeHandlerVersion": "1.8",
-                    "autoUpgradeMinorVersion": true,
-                    "type": "CustomScriptExtension"
-                }
-            }
-        ],
-
-        "vmssExtensions1": [
-            {
-                "name": "PrepareServiceFabric",
-                "properties": {
-                    "publisher": "Microsoft.Compute",
-                    "settings": {
-                        "fileUris": [
-                            "[variables('serviceFabricPrepareScriptUrl')]"
-                        ],
-                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'), variables('commandParam'))]"
-                    },
-                    "typeHandlerVersion": "1.8",
-                    "autoUpgradeMinorVersion": true,
-                    "type": "CustomScriptExtension"
-                }
-            },
+        "vmssExtensions": [
             {
                 "name": "DeployServiceFabricCluster",
                 "properties": {
@@ -318,7 +278,8 @@
                             "applicationStartPort": "[parameters('applicationStartPort')]",
                             "applicationEndPort": "[parameters('applicationEndPort')]",
                             "certificateStoreValue": "[parameters('certificateStoreValue')]",
-                            "certificateThumbprint": "[parameters('certificateThumbprint')]",
+                            "clusterCertificateThumbprint": "[parameters('clusterCertificateThumbprint')]",
+                            "serverCertificateThumbprint": "[parameters('serverCertificateThumbprint')]",
                             "reverseProxyCertificateThumbprint": "[parameters('reverseProxyCertificateThumbprint')]",
                             "adminClientCertificateThumbprint": "[parameters('adminClientCertificateThumbprint')]",
                             "nonAdminClientCertificateThumbprint": "[parameters('nonAdminClientCertificateThumbprint')]",
@@ -528,7 +489,7 @@
                       }
                     },
                     "extensionProfile": {
-                        "extensions": "[if(equals(parameters('runDSC'), 'Yes'), variables('vmssExtensions1'), variables('vmssExtensions0'))]"
+                        "extensions": "[variables('vmssExtensions')]"
                     }
                 }
             },

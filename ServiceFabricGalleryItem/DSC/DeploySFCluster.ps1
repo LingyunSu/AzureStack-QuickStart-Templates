@@ -69,7 +69,10 @@
     [string] $certificateStoreValue,
 
     [Parameter(Mandatory = $true)]
-    [string] $certificateThumbprint,
+    [string] $clusterCertificateThumbprint,
+
+    [Parameter(Mandatory = $true)]
+    [string] $serverCertificateThumbprint,
 
     [Parameter(Mandatory = $false)]
     [string] $reverseProxyCertificateThumbprint = "",
@@ -117,7 +120,8 @@
             DiagStoreAccountBlobUri = $DiagStoreAccountBlobUri
             DiagStoreAccountTableUri = $DiagStoreAccountTableUri
             CertificateStoreValue = $certificateStoreValue
-            CertificateThumbprint = $certificateThumbprint
+            ClusterCertificateThumbprint = $clusterCertificateThumbprint
+            ServerCertificateThumbprint = $serverCertificateThumbprint
             ReverseProxyCertificateThumbprint = $reverseProxyCertificateThumbprint
             AdminClientCertificateThumbprint = $adminClientCertificateThumbprint
             NonAdminClientCertificateThumbprint = $nonAdminClientCertificateThumbprint

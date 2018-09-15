@@ -119,7 +119,19 @@
                 "description": "Refers to the location URL in your key vault where the certificate was uploaded, it is should be in the format of https://<name of the vault>.vault.azure.net:443/secrets/<exact location>"
             }
         },
-        "certificateThumbprint": {
+        "clusterCertificateThumbprint": {
+            "type": "string",
+            "metadata": {
+                "description": "Certificate Thumbprint"
+            }
+        },
+        "serverCertificateUrlValue": {
+            "type": "string",
+            "metadata": {
+                "description": "Refers to the location URL in your key vault where the certificate was uploaded, it is should be in the format of https://<name of the vault>.vault.azure.net:443/secrets/<exact location>"
+            }
+        },
+        "serverCertificateThumbprint": {
             "type": "string",
             "metadata": {
                 "description": "Certificate Thumbprint"
@@ -245,21 +257,7 @@
             "subnetID": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
         },
 
-        "sfDeploymentTemplateURL": "[uri(parameters('scriptBaseUrl'), 'deploySFCluster.json')]",
         "vmssDeploymentTemplateURL": "[uri(parameters('scriptBaseUrl'), 'vmssProvision.json')]",
-
-        "scriptName": "PrepareServiceFabricDeployment.ps1",
-        "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
-
-        "clusterCertThumbprintParam": "[concat(' -CertificateThumbprint ', parameters('certificateThumbprint') )]",
-        "reverseProxyCertThumbprintParam": "[concat(' -ReverseProxyCertificateThumbprint ', parameters('reverseProxyCertificateThumbprint') )]",
-        "commandParam0": "[variables('clusterCertThumbprintParam')]",
-        "commandParam": "[if(equals(trim(parameters('reverseProxyCertificateThumbprint')), ''), variables('commandParam0'), concat(variables('commandParam0'), variables('reverseProxyCertThumbprintParam')))]",
-
-        "isReverseProxyCert": "[if(equals(trim(parameters('reverseProxyCertificateUrlValue')), ''), bool('false'), bool('true'))]",
-        "isSameCert": "[if(equals(parameters('clusterCertificateUrlValue'), parameters('reverseProxyCertificateUrlValue')), bool('true'), bool('false'))]",
-        "certsToInstall": "[if(or(not(variables('isReverseProxyCert')), variables('isSameCert')), array(parameters('clusterCertificateUrlValue')), concat(array(parameters('clusterCertificateUrlValue')), array(parameters('reverseProxyCertificateUrlValue'))))]",
-
         "delimiters": [ ",", ";" ],
         "adminClientCertificateThumbprint": "[split(trim(parameters('adminClientCertificateThumbprints')), variables('delimiters'))]",
         "nonAdminClientCertificateThumbprint": "[split(trim(parameters('nonAdminClientCertificateThumbprints')), variables('delimiters'))]"
@@ -369,163 +367,6 @@
         },
         {
             "apiVersion": "[variables('apiVersion').templateDeploymentApiVersion]",
-            "name": "[concat('VMSSProvisioning', copyindex())]",
-            "type": "Microsoft.Resources/deployments",
-            "copy": {
-                "name": "VMSSProvisioning",
-                "count": "[length(variables('nodeTypeInstanceCounts'))]"
-            },
-            "dependsOn": [
-                "PublicIPProvisioning",
-                "[variables('diagStoreAccountName')]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('vmssDeploymentTemplateURL')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "clusterName": {
-                        "value": "[parameters('clusterName')]"
-                    },
-                    "vmScaleSetName": {
-                        "value": "[concat(variables('imageConfig').vmssUniqueName, copyIndex())]"
-                    },
-                    "nodeTypePrefix": {
-                        "value": "[parameters('nodeTypePrefix')]"
-                    },
-                    "nodeTypeInstanceCounts": {
-                        "value": "[variables('nodeTypeInstanceCounts')]"
-                    },
-                    "nodeTypeIndex": {
-                        "value": "[copyIndex()]"
-                    },
-                    "subnetIPFormat": {
-                        "value": "[concat(variables('subnetPrefixFirstHalf'), '[]', variables('subnetPrefixSecondHalf'))]"
-                    },
-                    "overProvision": {
-                        "value": "[variables('imageConfig').overProvision]"
-                    },
-                    "vmImageSku": {
-                        "value": "[parameters('vmImageSku')]"
-                    },
-                    "vmImagePublisher": {
-                        "value": "[variables('imageConfig').vmImagePublisher]"
-                    },
-                    "vmImageOffer": {
-                        "value": "[variables('imageConfig').vmImageOffer]"
-                    },
-                    "vmImageVersion": {
-                        "value": "[variables('imageConfig').vmImageVersion]"
-                    },
-                    "vmNodeSize": {
-                        "value": "[parameters('vmNodeSize')]"
-                    },
-                    "osDiskName": {
-                        "value": "[concat(variables('imageConfig').osDiskName, copyIndex())]"
-                    },
-                    "diagStoreAccountName": {
-                        "value": "[variables('diagStoreAccountName')]"
-                    },
-                    "diagStoreAccountKey": {
-                        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('diagStoreAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
-                    },
-                    "diagStoreAccountBlobUri": {
-                        "value": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('diagStoreAccountName')), '2016-01-01').primaryEndpoints.blob]"
-                    },
-                    "diagStoreAccountTableUri": {
-                        "value": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('diagStoreAccountName')), '2016-01-01').primaryEndpoints.table]"
-                    },
-                    "vhdContainerName": {
-                        "value": "[concat(variables('imageConfig').vhdContainerName, copyIndex())]"
-                    },
-                    "adminUserName": {
-                        "value": "[parameters('adminUserName')]"
-                    },
-                    "adminPassword": {
-                        "value": "[parameters('adminPassword')]"
-                    },
-                    "dnsLabel": {
-                        "value": "[if(equals(string(copyIndex()), '0'), variables('dnsLabel'), concat(variables('dnsLabel'), copyIndex()))]"
-                    },
-                    "subnetID": {
-                        "value": "[concat(variables('derivedIds').subnetID, copyIndex())]"
-                    },
-                    "publicIPID": {
-                        "value": "[resourceId('Microsoft.Network/publicIPAddresses', concat(concat(variables('imageConfig').vmssUniqueName, copyIndex()), 'pip'))]"
-                    },
-                    "lbPortsArray": {
-                        "value": "[variables('lbPortsArray')]"
-                    },
-                    "sourceVaultValue": {
-                        "value": "[parameters('sourceVaultValue')]"
-                    },
-                    "clusterCertificateUrlValue": {
-                        "value": "[parameters('clusterCertificateUrlValue')]"
-                    },
-                    "certificateStoreValue": {
-                        "value": "[variables('certificateStoreValue')]"
-                    },
-                    "certificateThumbprint": {
-                        "value": "[parameters('certificateThumbprint')]"
-                    },
-                    "reverseProxyCertificateUrlValue": {
-                        "value": "[parameters('reverseProxyCertificateUrlValue')]"
-                    },
-                    "reverseProxyCertificateThumbprint": {
-                        "value": "[parameters('reverseProxyCertificateThumbprint')]"
-                    },
-                    "servicefabricTcpGatewayPort": {
-                        "value": "[parameters('servicefabricTcpGatewayPort')]"
-                    },
-                    "servicefabricHttpGatewayPort": {
-                        "value": "[parameters('servicefabricHttpGatewayPort')]"
-                    },
-                    "servicereverseProxyEndpointPort": {
-                        "value": "[parameters('servicefabricReverseProxyEndpointPort')]"
-                    },
-                    "ephemeralStartPort": {
-                        "value": "[variables('ephemeralStartPort')]"
-                    },
-                    "ephemeralEndPort": {
-                        "value": "[variables('ephemeralEndPort')]"
-                    },
-                    "applicationStartPort": {
-                        "value": "[variables('applicationStartPort')]"
-                    },
-                    "applicationEndPort": {
-                        "value": "[variables('applicationEndPort')]"
-                    },
-                    "adminClientCertificateThumbprint": {
-                        "value": "[variables('adminClientCertificateThumbprint')]"
-                    },
-                    "adminClientConnectionEndpoint": {
-                        "value": "[concat(reference(concat('Microsoft.Network/publicIPAddresses/', concat(concat(variables('imageConfig').vmssUniqueName, '0'), 'pip')), variables('apiVersion').publicIPApiVersion).dnsSettings.fqdn, ':', parameters('servicefabricTcpGatewayPort'))]"
-                    },
-                    "nonAdminClientCertificateThumbprint": {
-                        "value": "[variables('nonAdminClientCertificateThumbprint')]"
-                    },
-                    "DNSService": {
-                        "value": "[parameters('DNSService')]"
-                    },
-                    "RepairManager": {
-                        "value": "[parameters('RepairManager')]"
-                    },
-                    "serviceFabricUrl": {
-                        "value": "[parameters('serviceFabricUrl')]"
-                    },
-                    "serviceFabricRuntimeUrl": {
-                        "value": "[parameters('serviceFabricRuntimeUrl')]"
-                    },
-                    "scriptBaseUrl": {
-                        "value": "[parameters('scriptBaseUrl')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "[variables('apiVersion').templateDeploymentApiVersion]",
             "name": "[concat('SFDeployment', copyindex())]",
             "type": "Microsoft.Resources/deployments",
             "copy": {
@@ -533,7 +374,6 @@
                 "count": "[length(variables('nodeTypeInstanceCounts'))]"
             },
             "dependsOn": [
-                "VMSSProvisioning",
                 "[variables('diagStoreAccountName')]"
             ],
             "properties": {
@@ -603,9 +443,6 @@
                     "adminPassword": {
                         "value": "[parameters('adminPassword')]"
                     },
-                    "runDSC": {
-                        "value": "Yes"
-                    },
                     "dnsLabel": {
                         "value": "[if(equals(string(copyIndex()), '0'), variables('dnsLabel'), concat(variables('dnsLabel'), copyIndex()))]"
                     },
@@ -621,14 +458,20 @@
                     "sourceVaultValue": {
                         "value": "[parameters('sourceVaultValue')]"
                     },
-                    "clusterCertificateUrlValue": {
-                        "value": "[parameters('clusterCertificateUrlValue')]"
-                    },
                     "certificateStoreValue": {
                         "value": "[variables('certificateStoreValue')]"
                     },
-                    "certificateThumbprint": {
-                        "value": "[parameters('certificateThumbprint')]"
+                    "clusterCertificateUrlValue": {
+                        "value": "[parameters('clusterCertificateUrlValue')]"
+                    },
+                    "clusterCertificateThumbprint": {
+                        "value": "[parameters('clusterCertificateThumbprint')]"
+                    },
+                    "serverCertificateUrlValue": {
+                        "value": "[parameters('serverCertificateUrlValue')]"
+                    },
+                    "serverCertificateThumbprint": {
+                        "value": "[parameters('serverCertificateThumbprint')]"
                     },
                     "reverseProxyCertificateUrlValue": {
                         "value": "[parameters('reverseProxyCertificateUrlValue')]"
