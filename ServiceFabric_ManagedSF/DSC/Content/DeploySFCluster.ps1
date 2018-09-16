@@ -68,7 +68,7 @@
     [Parameter(Mandatory = $true)]
     [string] $certificateStoreValue,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [string] $RootCACertBase64,
 
     [Parameter(Mandatory = $false)]

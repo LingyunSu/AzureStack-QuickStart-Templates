@@ -28,7 +28,7 @@
     },
     "additionalNodeTypeInstaceCounts": {
       "type": "array",
-      "defaultValue": [ ],
+      "defaultValue": [],
       "metadata": {
         "description": "Comma seperated list of instance counts for additional node types (if any) - (like [3, 5, 2])."
       }
@@ -94,14 +94,14 @@
     },
     "lbApplicationPorts": {
       "type": "array",
-      "defaultValue": [ ],
+      "defaultValue": [],
       "metadata": {
         "description": "Array of application ports to be opened (like [80, 8080, 8081])."
       }
     },
     "nsgPorts": {
       "type": "array",
-      "defaultValue": [ ],
+      "defaultValue": [],
       "metadata": {
         "description": "Array of additional ports to be opened in the NSG (like [3389, 80, 8081])."
       }
@@ -226,7 +226,7 @@
     "applicationStartPort": 20000,
     "applicationEndPort": 30000,
     "lbPortsArray": "[concat(array(parameters('servicefabricTcpGatewayPort')), array(parameters('servicefabricHttpGatewayPort')), parameters('lbApplicationPorts'))]",
-    "nsgPortsArray": "[concat(variables('lbPortsArray'), parameters('nsgPorts'))]",
+    "nsgPortsArray": "[concat(variables('lbPortsArray'), parameters('nsgPorts'), array(concat('-', parameters('servicefabricTcpGatewayPort'))))]",
     "nodeTypeInstanceCounts": "[concat(array(parameters('primaryNtInstanceCount')), parameters('additionalNodeTypeInstaceCounts'))]",
     "imageConfig": {
       "vmssUniqueName": "[concat(parameters('nodeTypePrefix'), 'vmss')]",
@@ -252,7 +252,6 @@
     "isReverseProxyCert": "[if(equals(trim(parameters('reverseProxyCertificateUrlValue')), ''), bool('false'), bool('true'))]",
     "certurls": "[concat(array(parameters('clusterCertificateUrlValue')), array(parameters('serverCertificateUrlValue')), array(parameters('adminClientCertificateUrlValue')), array(parameters('nonAdminClientCertificateUrlValue')), array(parameters('sslCertSecretUri')))]",
     "certsToInstall": "[if(not(variables('isReverseProxyCert')), variables('certurls'), concat(variables('certurls'), array(parameters('reverseProxyCertificateUrlValue'))))]"
-
   },
   "resources": [
     {
@@ -281,17 +280,17 @@
             "name": "securityRules",
             "count": "[length(variables('nsgPortsArray'))]",
             "input": {
-              "name": "[concat('NSGRuleForPort_', variables('nsgPortsArray')[copyIndex('securityRules')])]",
+              "name": "[concat('NSGRuleForPort_',  if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'), replace(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-','Out_'),string(variables('nsgPortsArray')[copyIndex('securityRules')])))]",
               "properties": {
-                "description": "[concat('Allow ', string(variables('nsgPortsArray')[copyIndex('securityRules')]))]",
+                "description": "[concat('Allow ', if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'), replace(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-',''),string(variables('nsgPortsArray')[copyIndex('securityRules')])))]",
                 "protocol": "Tcp",
                 "sourcePortRange": "*",
-                "destinationPortRange": "[variables('nsgPortsArray')[copyIndex('securityRules')]]",
+                "destinationPortRange": "[if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'), replace(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-',''),string(variables('nsgPortsArray')[copyIndex('securityRules')]))]",
                 "sourceAddressPrefix": "Internet",
                 "destinationAddressPrefix": "*",
                 "access": "Allow",
                 "priority": "[int(concat('10', copyIndex('securityRules')))]",
-                "direction": "Inbound"
+                "direction": "[if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'),'Outbound','Inbound')]"
               }
             }
           }
