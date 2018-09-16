@@ -75,7 +75,8 @@
     [string] $serverCertificateThumbprint,
 
     [Parameter(Mandatory = $false)]
-    [string] $reverseProxyCertificateThumbprint = "",
+    [AllowEmptyString()]
+    [string] $reverseProxyCertificateThumbprint = @(),
 
     [Parameter(Mandatory = $false)]
     [string] $DNSService = "No",
@@ -84,9 +85,11 @@
     [string] $RepairManager = "No",
 
     [Parameter(Mandatory = $false)]
+    [AllowEmptyString()]
     [string[]] $adminClientCertificateThumbprint = @(),
 
     [Parameter(Mandatory = $false)]
+    [AllowEmptyString()]
     [string[]] $nonAdminClientCertificateThumbprint = @(),
 
     [Parameter(Mandatory = $true)]
