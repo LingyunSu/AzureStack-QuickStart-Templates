@@ -38,7 +38,13 @@
     "clusterCertificateUrlValue": {
       "value": ""
     },
-    "certificateThumbprint": {
+    "clusterCertificateThumbprint": {
+      "value": "0984053b9639215d278a0e4b4ab1120e75057463"
+    },
+	"serverCertificateUrlValue": {
+      "value": ""
+    },
+    "serverCertificateThumbprint": {
       "value": "0984053b9639215d278a0e4b4ab1120e75057463"
     },
     "reverseProxyCertificateUrlValue": {
