@@ -54,21 +54,10 @@
     [PSCredential] $Credential,
 
     [Parameter(Mandatory = $true)]
-    [string] $DiagStoreAccountName,
-
-    [Parameter(Mandatory = $true)]
-    [string] $DiagStoreAccountKey,
-
-    [Parameter(Mandatory = $true)]
-    [string] $DiagStoreAccountBlobUri,
-
-    [Parameter(Mandatory = $true)]
-    [string] $DiagStoreAccountTableUri,
-
-    [Parameter(Mandatory = $true)]
     [string] $certificateStoreValue,
 
     [Parameter(Mandatory = $false)]
+    [AllowEmptyString()]
     [string] $RootCACertBase64,
 
     [Parameter(Mandatory = $false)]
@@ -103,10 +92,6 @@
             ConfigPath = $ConfigPath
             ServiceFabricUrl = $serviceFabricUrl
             ServiceFabricRuntimeUrl = $serviceFabricRuntimeUrl
-            DiagStoreAccountName = $DiagStoreAccountName
-            DiagStoreAccountKey = $DiagStoreAccountKey
-            DiagStoreAccountBlobUri = $DiagStoreAccountBlobUri
-            DiagStoreAccountTableUri = $DiagStoreAccountTableUri
             CertificateStoreValue = $certificateStoreValue
             ClientConnectionEndpoint = $ClientConnectionEndpoint
             PsDscRunAsCredential = $Credential

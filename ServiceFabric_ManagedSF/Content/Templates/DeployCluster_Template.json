@@ -217,7 +217,6 @@
 
     "subnetName": "[concat(variables('uniquePrefix'), 'subnet')]",
     "dnsLabel": "[parameters('clusterName')]",
-    "diagStoreAccountName": "[toLower(concat('diagSA', uniqueString(resourceGroup().id)))]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefixFirstHalf": "10.0.",
     "subnetPrefixSecondHalf": ".0/24",
@@ -244,26 +243,13 @@
       "subnetID": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
     },
 
-    "sfDeploymentTemplateURL": "[uri(parameters('scriptBaseUrl'), 'deploySFCluster.json')]",
     "vmssDeploymentTemplateURL": "[uri(parameters('scriptBaseUrl'), 'vmssProvision.json')]",
-
-    "scriptName": "PrepareServiceFabricDeployment.ps1",
-    "serviceFabricPrepareScriptUrl": "[uri(parameters('scriptBaseUrl'), variables('scriptName'))]",
+    
     "isReverseProxyCert": "[if(equals(trim(parameters('reverseProxyCertificateUrlValue')), ''), bool('false'), bool('true'))]",
     "certurls": "[concat(array(parameters('clusterCertificateUrlValue')), array(parameters('serverCertificateUrlValue')), array(parameters('adminClientCertificateUrlValue')), array(parameters('nonAdminClientCertificateUrlValue')), array(parameters('sslCertSecretUri')))]",
     "certsToInstall": "[if(not(variables('isReverseProxyCert')), variables('certurls'), concat(variables('certurls'), array(parameters('reverseProxyCertificateUrlValue'))))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('diagStoreAccountName')]",
-      "apiVersion": "[variables('apiVersion').storageApiVersion]",
-      "location": "[variables('location')]",
-      "sku": {
-        "name": "[variables('imageConfig').storageAccountType]"
-      },
-      "kind": "Storage"
-    },
     {
       "apiVersion": "[variables('apiVersion').vNetApiVersion]",
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -280,7 +266,7 @@
             "name": "securityRules",
             "count": "[length(variables('nsgPortsArray'))]",
             "input": {
-              "name": "[concat('NSGRuleForPort_',  if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'), replace(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-','Out_'),string(variables('nsgPortsArray')[copyIndex('securityRules')])))]",
+              "name": "[concat('NSGRuleForPort_', if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'), replace(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-','Out_'),string(variables('nsgPortsArray')[copyIndex('securityRules')])))]",
               "properties": {
                 "description": "[concat('Allow ', if(startsWith(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-'), replace(string(variables('nsgPortsArray')[copyIndex('securityRules')]),'-',''),string(variables('nsgPortsArray')[copyIndex('securityRules')])))]",
                 "protocol": "Tcp",
@@ -361,12 +347,11 @@
       "name": "[concat('VMSSProvisioning', copyindex())]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
-        "name": "VMSSProvisionAndSFDeployment",
+        "name": "VMSSProvisioning",
         "count": "[length(variables('nodeTypeInstanceCounts'))]"
       },
       "dependsOn": [
-        "PublicIPProvisioning",
-        "[variables('diagStoreAccountName')]"
+        "PublicIPProvisioning"
       ],
       "properties": {
         "mode": "Incremental",
@@ -413,18 +398,6 @@
           },
           "osDiskName": {
             "value": "[concat(variables('imageConfig').osDiskName, copyIndex())]"
-          },
-          "diagStoreAccountName": {
-            "value": "[variables('diagStoreAccountName')]"
-          },
-          "diagStoreAccountKey": {
-            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('diagStoreAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
-          },
-          "diagStoreAccountBlobUri": {
-            "value": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('diagStoreAccountName')), '2016-01-01').primaryEndpoints.blob]"
-          },
-          "diagStoreAccountTableUri": {
-            "value": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('diagStoreAccountName')), '2016-01-01').primaryEndpoints.table]"
           },
           "vhdContainerName": {
             "value": "[concat(variables('imageConfig').vhdContainerName, copyIndex())]"

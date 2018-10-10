@@ -72,18 +72,6 @@
         "description": "Remote desktop user password. Must be a strong password"
       }
     },
-    "diagStoreAccountName": {
-      "type": "string"
-    },
-    "diagStoreAccountKey": {
-      "type": "string"
-    },
-    "diagStoreAccountBlobUri": {
-      "type": "string"
-    },
-    "diagStoreAccountTableUri": {
-      "type": "string"
-    },
     "dnsLabel": {
       "type": "string"
     },
@@ -233,10 +221,6 @@
               "ConfigPath": "[variables('serviceFabricConfigPath')]",
               "serviceFabricUrl": "[parameters('serviceFabricUrl')]",
               "serviceFabricRuntimeUrl": "[variables('serviceFabricRuntimeUrl')]",
-              "DiagStoreAccountName": "[parameters('diagStoreAccountName')]",
-              "DiagStoreAccountKey": "[parameters('diagStoreAccountKey')]",
-              "DiagStoreAccountBlobUri": "[parameters('diagStoreAccountBlobUri')]",
-              "DiagStoreAccountTableUri": "[parameters('diagStoreAccountTableUri')]",
               "RootCACertBase64": "[parameters('rootCertBase64')]"
             }
           },
