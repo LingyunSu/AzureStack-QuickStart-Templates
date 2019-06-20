@@ -8,7 +8,7 @@ echo "Run post-deployment test to validate the health of minikube deployment..."
 
 # Check minikube status, if it is off start minkube
 echo "Check minikube status..."
-isMinikubeRunning="$(sudo minikube status | grep 'minikube: Running')"
+isMinikubeRunning="$(sudo minikube status | grep 'minikube-vm')"
 
 # Start minikube if it is off
 if [ -z $isMinikubeRunning ]; then
@@ -16,7 +16,7 @@ if [ -z $isMinikubeRunning ]; then
   sudo minikube start --vm-driver 'none'
 
   # Check status again
-  isMinikubeRunning="$(sudo minikube status | grep 'minikube: Running')"
+  isMinikubeRunning="$(sudo minikube status | grep 'minikube-vm')"
   if [[ -z $isMinikubeRunning ]]; then
     echo -e "${RED}Validation failed. Unable to start minikube. ${NC} "
     exit 3
