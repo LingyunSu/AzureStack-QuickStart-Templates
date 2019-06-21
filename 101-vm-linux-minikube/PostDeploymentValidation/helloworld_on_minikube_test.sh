@@ -5,7 +5,7 @@ GREEN='\033[0;32m'  # For crucial check success
 NC='\033[0m'        # No color, back to normal
 
 echo "Run post-deployment test to validate the health of minikube deployment..."
-
+sleep 30s
 # Check minikube status, if it is off start minkube
 echo "Check minikube status..."
 isMinikubeRunning="$(sudo minikube status | grep 'minikube-vm')"
